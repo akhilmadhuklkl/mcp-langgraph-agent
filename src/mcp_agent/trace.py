@@ -3,12 +3,19 @@ from typing import Any
 SENSITIVE_KEYS = {"body", "content", "password", "secret", "token", "access_token", "refresh_token"}
 
 
+def _redact_value(key: str, value: Any) -> Any:
+    if key.lower() in SENSITIVE_KEYS:
+        return "[REDACTED]"
+    if isinstance(value, dict):
+        return {nested_key: _redact_value(nested_key, nested_value) for nested_key, nested_value in value.items()}
+    if isinstance(value, list):
+        return [_redact_value("", item) for item in value]
+    return value
+
+
 def redact_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
     """Return trace-safe arguments without common credential or message fields."""
-    return {
-        key: "[REDACTED]" if key.lower() in SENSITIVE_KEYS else value
-        for key, value in arguments.items()
-    }
+    return {key: _redact_value(key, value) for key, value in arguments.items()}
 
 
 def format_trace(trace: list[dict[str, Any]]) -> str:

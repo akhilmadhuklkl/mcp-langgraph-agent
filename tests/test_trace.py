@@ -9,6 +9,11 @@ def test_redact_arguments_hides_sensitive_fields():
     }
 
 
+def test_redact_arguments_recurses_into_nested_values():
+    result = redact_arguments({"message": {"content": "private", "parts": [{"token": "secret"}]}})
+    assert result == {"message": {"content": "[REDACTED]", "parts": [{"token": "[REDACTED]"}]}}
+
+
 def test_formats_successful_trace():
     output = format_trace([
         {
