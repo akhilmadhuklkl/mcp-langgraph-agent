@@ -149,6 +149,17 @@ credentials in the current process environment:
   -GoogleOAuthClientJson "C:\Users\User\Downloads\client_secret_<client-id>.json"
 ```
 
+To run read-only contract checks against all three real MCP servers after they
+are configured, use:
+
+```powershell
+python scripts/verify_live_servers.py
+```
+
+This validates that the expected tools are discoverable and accepts the same
+arguments used by the agent. It is intentionally opt-in and is not part of CI
+because it requires your external credentials.
+
 Run tests:
 
 ```powershell
