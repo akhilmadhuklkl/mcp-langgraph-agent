@@ -17,3 +17,11 @@ def github_server_config() -> ExternalServerConfig | None:
     args = shlex.split(os.getenv("GITHUB_MCP_ARGS", "stdio"))
     env = dict(os.environ)
     return ExternalServerConfig(command=command, args=args, env=env)
+
+
+def gmail_server_config() -> ExternalServerConfig | None:
+    command = os.getenv("GMAIL_MCP_COMMAND")
+    if not command:
+        return None
+    args = shlex.split(os.getenv("GMAIL_MCP_ARGS", "stdio"))
+    return ExternalServerConfig(command=command, args=args, env=dict(os.environ))

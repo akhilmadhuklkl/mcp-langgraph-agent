@@ -2,7 +2,7 @@ import argparse
 import asyncio
 
 from .cli_helpers import format_history
-from .config import github_server_config
+from .config import gmail_server_config, github_server_config
 from .doctor import format_checks, readiness_checks
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
@@ -19,9 +19,14 @@ async def connect_registry() -> MCPToolRegistry:
     github_config = github_server_config()
     if github_config:
         await registry.connect_external("github", github_config)
-        await registry.connect(["gmail", "notion"])
     else:
-        await registry.connect(["github", "gmail", "notion"])
+        await registry.connect(["github"])
+    gmail_config = gmail_server_config()
+    if gmail_config:
+        await registry.connect_external("gmail", gmail_config)
+    else:
+        await registry.connect(["gmail"])
+    await registry.connect(["notion"])
     return registry
 
 

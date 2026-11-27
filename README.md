@@ -55,6 +55,11 @@ Check external MCP readiness without exposing credentials:
 python -m mcp_agent.cli doctor
 ```
 
+Gmail follows the same pattern as GitHub. Set `GMAIL_MCP_COMMAND` and
+optionally `GMAIL_MCP_ARGS` to connect an external Gmail MCP server. If unset,
+the local mock Gmail server is used. Keep OAuth credentials in the external
+server's environment and never commit them.
+
 Resume a pending run after a human decision:
 
 ```powershell
