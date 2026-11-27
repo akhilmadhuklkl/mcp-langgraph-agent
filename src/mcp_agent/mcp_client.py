@@ -80,6 +80,7 @@ class MCPToolRegistry:
 
     async def call(self, namespaced_name: str, arguments: dict[str, Any]) -> Any:
         handle = self.tools[namespaced_name]
+        self._validate_arguments(handle, arguments)
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 2):
             try:
@@ -104,6 +105,20 @@ class MCPToolRegistry:
             elif hasattr(content, "data"):
                 values.append(content.data)
         return values[0] if len(values) == 1 else values
+
+    @staticmethod
+    def _validate_arguments(handle: ToolHandle, arguments: dict[str, Any]) -> None:
+        properties = set(handle.schema.get("properties", {}))
+        required = set(handle.schema.get("required", []))
+        missing = sorted(required - arguments.keys())
+        unknown = sorted(set(arguments) - properties) if properties else []
+        if missing or unknown:
+            details = []
+            if missing:
+                details.append(f"missing required arguments: {', '.join(missing)}")
+            if unknown:
+                details.append(f"unknown arguments: {', '.join(unknown)}")
+            raise ValueError(f"Invalid arguments for {handle.qualified_name}: {'; '.join(details)}")
 
     async def close(self) -> None:
         await self.stack.aclose()
