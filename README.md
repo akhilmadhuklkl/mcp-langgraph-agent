@@ -87,10 +87,20 @@ configured through `MCPToolRegistry(timeout_seconds=..., max_retries=...)`.
 CLI runs are persisted in `data/agent_runs.db` (ignored by Git). Each run prints
 a UUID that can be used by future resume and run-history commands.
 
-To use the official GitHub MCP server, install `github-mcp-server`, copy
-`.env.example` to `.env`, and provide `GITHUB_PERSONAL_ACCESS_TOKEN` through
-your shell or environment manager. Set `GITHUB_MCP_COMMAND` to the executable
-name or full path. If it is unset, the local mock GitHub server is used.
+To use the official GitHub MCP server with Docker, copy `.env.example` to your
+environment configuration and provide `GITHUB_PERSONAL_ACCESS_TOKEN` through
+your shell or environment manager. The included Docker command uses the public
+`ghcr.io/github/github-mcp-server` image. Alternatively, install the native
+`github-mcp-server` binary and set `GITHUB_MCP_COMMAND=github-mcp-server` with
+`GITHUB_MCP_ARGS=stdio`. If the command is unset, the local mock GitHub server
+is used.
+
+On PowerShell, configure the token for the current session without putting it
+in source control:
+
+```powershell
+$env:GITHUB_PERSONAL_ACCESS_TOKEN = "<your-token>"
+```
 
 Run tests:
 
