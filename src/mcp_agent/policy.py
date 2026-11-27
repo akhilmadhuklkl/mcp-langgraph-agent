@@ -6,7 +6,7 @@ MUTATING_TOOLS = {
     "github.create_pull_request",
     "gmail.draft_email",
     "gmail.send_email",
-    "notion.create_page",
+    "drive.create_file",
 }
 
 

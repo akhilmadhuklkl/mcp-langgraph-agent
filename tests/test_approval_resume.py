@@ -2,8 +2,8 @@ from mcp_agent.state import apply_approval_decision, initial_state
 
 
 def test_approval_continues_from_existing_plan():
-    state = initial_state("Create a Notion page")
-    state["plan"] = [{"tool": "notion.create_page", "arguments": {"title": "Plan"}}]
+    state = initial_state("Create a Google Drive file")
+    state["plan"] = [{"tool": "drive.create_file", "arguments": {"name": "Plan"}}]
     state["approval_status"] = "pending"
     state["current_step"] = 0
     resumed = apply_approval_decision(state, approved=True)

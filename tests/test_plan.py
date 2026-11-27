@@ -6,6 +6,6 @@ def test_routes_github_and_gmail_request():
     assert [step["tool"] for step in plan] == ["github.search_issues", "gmail.search_emails"]
 
 
-def test_routes_notion():
-    plan = deterministic_plan("Find the project documentation in Notion")
-    assert plan[0]["tool"] == "notion.search_pages"
+def test_routes_drive():
+    plan = deterministic_plan("Find the project documentation in Google Drive")
+    assert plan[0]["tool"] == "drive.search_files"

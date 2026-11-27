@@ -25,3 +25,11 @@ def gmail_server_config() -> ExternalServerConfig | None:
         return None
     args = shlex.split(os.getenv("GMAIL_MCP_ARGS", "stdio"))
     return ExternalServerConfig(command=command, args=args, env=dict(os.environ))
+
+
+def drive_server_config() -> ExternalServerConfig | None:
+    command = os.getenv("GOOGLE_DRIVE_MCP_COMMAND")
+    if not command:
+        return None
+    args = shlex.split(os.getenv("GOOGLE_DRIVE_MCP_ARGS", "stdio"))
+    return ExternalServerConfig(command=command, args=args, env=dict(os.environ))

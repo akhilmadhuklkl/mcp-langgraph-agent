@@ -12,12 +12,12 @@ and routes multi-step tasks through a LangGraph workflow.
 - Explicit workflow state for plans, results, errors, and approvals
 - Optional LLM planner with structured tool plans
 - Result-aware execution where later tools can consume earlier results
-- Approval gates before mutating GitHub, Gmail, or Notion tools
+- Approval gates before mutating GitHub, Gmail, or Google Drive tools
 - Bounded MCP retries, exponential backoff, and per-call timeouts
 - SQLite persistence for run state and resumable workflows
 - Optional connection to the official GitHub MCP server over stdio
 - LangGraph state-machine orchestration
-- Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
+- Multi-step plans such as: "Check GitHub issues and summarize related Drive documents"
 - Deterministic demo mode that does not require an API key
 - Optional OpenAI-backed planning and tool selection
 - Explicit tool-call trace for debugging and portfolio demos
@@ -26,7 +26,7 @@ and routes multi-step tasks through a LangGraph workflow.
 
 - `github`: search issues and inspect pull requests
 - `gmail`: search email and create drafts without sending
-- `notion`: search project pages and create notes
+- `drive`: search project files and create documents
 
 ## Setup
 
@@ -55,10 +55,11 @@ Check external MCP readiness without exposing credentials:
 python -m mcp_agent.cli doctor
 ```
 
-Gmail follows the same pattern as GitHub. Set `GMAIL_MCP_COMMAND` and
-optionally `GMAIL_MCP_ARGS` to connect an external Gmail MCP server. If unset,
-the local mock Gmail server is used. Keep OAuth credentials in the external
-server's environment and never commit them.
+Gmail and Google Drive follow the same pattern as GitHub. Set
+`GMAIL_MCP_COMMAND` or `GOOGLE_DRIVE_MCP_COMMAND` and optionally the matching
+`*_ARGS` variable to connect external servers. If unset, local mock servers are
+used. Keep OAuth credentials in the external servers' environments and never
+commit them.
 
 Resume a pending run after a human decision:
 
@@ -72,7 +73,7 @@ are configured:
 
 ```powershell
 pip install -e ".[model]"
-python -m mcp_agent.cli "Find GitHub issues and related Notion notes" --model
+python -m mcp_agent.cli run "Find GitHub issues and related Drive documents" --model
 ```
 
 The LLM receives the discovered MCP tool catalog and must return exact
@@ -80,11 +81,11 @@ namespaced tool names plus JSON arguments. Deterministic planning remains the
 default for local development and tests.
 
 Multi-step plans can reference the latest tool output with `${last_result}`.
-For example, a GitHub search can feed its result into a related Notion search.
+For example, a GitHub search can feed its result into a related Drive search.
 
 Mutating tools are policy-protected. The graph pauses with
 `approval_status="pending"` before executing tools such as
-`gmail.draft_email` or `notion.create_page`.
+`gmail.draft_email` or `drive.create_file`.
 
 Pending state can be resumed by applying an approval decision. An approved
 state continues at the paused step; a rejected state ends safely without
@@ -133,7 +134,7 @@ User request
     v
 LangGraph planner ----> MCP tool registry
     |                         |
-    |                  GitHub / Gmail / Notion
+    |                  GitHub / Gmail / Google Drive
     v                         |
 Tool execution <-------------+
     |

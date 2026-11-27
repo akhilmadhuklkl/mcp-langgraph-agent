@@ -6,9 +6,9 @@ def deterministic_plan(request: str) -> list[dict[str, Any]]:
     plan: list[dict[str, Any]] = []
     if "github" in text or "issue" in text or "pull request" in text:
         plan.append({"tool": "github.search_issues", "arguments": {"query": "open"}})
-    if "notion" in text or "notes" in text or "documentation" in text:
+    if "drive" in text or "google drive" in text or "document" in text or "documentation" in text:
         query = "${last_result}" if plan else "MCP"
-        plan.append({"tool": "notion.search_pages", "arguments": {"query": query}})
+        plan.append({"tool": "drive.search_files", "arguments": {"query": query}})
     if "email" in text or "gmail" in text or "inbox" in text:
         query = "${last_result}" if plan else "MCP"
         plan.append({"tool": "gmail.search_emails", "arguments": {"query": query}})

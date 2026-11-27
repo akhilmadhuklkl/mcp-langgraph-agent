@@ -36,22 +36,22 @@ def gmail_server() -> FastMCP:
     return server
 
 
-def notion_server() -> FastMCP:
-    server = FastMCP("notion")
+def drive_server() -> FastMCP:
+    server = FastMCP("drive")
 
     @server.tool()
     def search_pages(query: str) -> list[dict[str, str]]:
-        """Search the local demo Notion workspace."""
-        return [{"title": "MCP Agent Project Plan", "url": "notion://mcp-agent-plan", "match": query}]
+        """Search the local demo Google Drive workspace."""
+        return [{"name": "MCP Agent Project Plan", "mime_type": "document", "url": "drive://mcp-agent-plan", "match": query}]
 
     @server.tool()
-    def create_page(title: str, content: str) -> dict[str, str]:
-        """Create a local demo Notion page."""
-        return {"title": title, "content": content, "status": "created"}
+    def create_file(name: str, content: str) -> dict[str, str]:
+        """Create a local demo Google Drive document."""
+        return {"name": name, "content": content, "mime_type": "document", "status": "created"}
 
     return server
 
 
 def main(server_name: str) -> None:
-    servers = {"github": github_server, "gmail": gmail_server, "notion": notion_server}
+    servers = {"github": github_server, "gmail": gmail_server, "drive": drive_server}
     servers[server_name]().run(transport="stdio")

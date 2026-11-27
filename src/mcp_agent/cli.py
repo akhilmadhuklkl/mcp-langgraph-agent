@@ -2,7 +2,7 @@ import argparse
 import asyncio
 
 from .cli_helpers import format_history
-from .config import gmail_server_config, github_server_config
+from .config import drive_server_config, gmail_server_config, github_server_config
 from .doctor import format_checks, readiness_checks
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
@@ -26,7 +26,11 @@ async def connect_registry() -> MCPToolRegistry:
         await registry.connect_external("gmail", gmail_config)
     else:
         await registry.connect(["gmail"])
-    await registry.connect(["notion"])
+    drive_config = drive_server_config()
+    if drive_config:
+        await registry.connect_external("drive", drive_config)
+    else:
+        await registry.connect(["drive"])
     return registry
 
 
