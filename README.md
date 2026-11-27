@@ -125,6 +125,16 @@ in source control:
 $env:GITHUB_PERSONAL_ACCESS_TOKEN = "<your-token>"
 ```
 
+For a reusable live run, authenticate GitHub with `gh auth login`, then use the
+helper below. It reads the Google OAuth client path you provide and keeps all
+credentials in the current process environment:
+
+```powershell
+.\scripts\run-live-agent.ps1 `
+  -Request "Search Gmail for MCP and find matching Drive files" `
+  -GoogleOAuthClientJson "C:\Users\User\Downloads\client_secret_<client-id>.json"
+```
+
 Run tests:
 
 ```powershell
