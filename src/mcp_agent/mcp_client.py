@@ -8,6 +8,7 @@ from typing import Any
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.client.streamable_http import streamable_http_client
 
 from .config import ExternalServerConfig
 from .reliability import retry_count, retry_delay
@@ -52,6 +53,22 @@ class MCPToolRegistry:
     async def connect_external(self, name: str, config: ExternalServerConfig) -> None:
         params = StdioServerParameters(command=config.command, args=config.args, env=config.env)
         await self._connect_with_params(name, params)
+
+    async def connect_streamable_http(self, name: str, url: str) -> None:
+        """Connect to an MCP server exposed through Streamable HTTP."""
+        read, write, _ = await self.stack.enter_async_context(streamable_http_client(url))
+        session = await self.stack.enter_async_context(ClientSession(read, write))
+        await session.initialize()
+        self.sessions[name] = session
+        result = await session.list_tools()
+        for tool in result.tools:
+            key = f"{name}.{tool.name}"
+            self.tools[key] = ToolHandle(
+                server=name,
+                name=tool.name,
+                description=tool.description or "",
+                schema=tool.inputSchema,
+            )
 
     async def _connect_with_params(self, name: str, params: StdioServerParameters) -> None:
         read, write = await self.stack.enter_async_context(stdio_client(params))

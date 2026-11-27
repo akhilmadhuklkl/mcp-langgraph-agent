@@ -192,6 +192,18 @@ The project intentionally keeps server processes separate from the client. This
 makes the MCP boundary visible and makes it easy to replace the demo servers with
 real services later.
 
+The registry also supports MCP servers using Streamable HTTP. From Python, pass
+the server name and endpoint URL:
+
+```python
+registry = MCPToolRegistry()
+await registry.connect_streamable_http("remote", "https://example.com/mcp")
+```
+
+The discovered tools use the same `server.tool` namespace and follow the same
+validation, retry, timeout, tracing, approval, and metrics behavior as stdio
+servers.
+
 ## Suggested extensions
 
 1. Add approval before mutating tools such as `create_task`.
