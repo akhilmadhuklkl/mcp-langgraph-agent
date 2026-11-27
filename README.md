@@ -1,0 +1,75 @@
+# MCP Multi-Server Agent
+
+A Python AI agent that connects to multiple MCP servers, discovers their tools,
+and routes multi-step tasks through a LangGraph workflow.
+
+## What this demonstrates
+
+- One client connecting to three independent MCP servers over stdio
+- Dynamic `list_tools()` discovery and namespaced tool routing
+- LangGraph state-machine orchestration
+- Multi-step plans such as: "Check my calendar and create a task for anything urgent"
+- Deterministic demo mode that does not require an API key
+- Optional OpenAI-backed planning and tool selection
+- Explicit tool-call trace for debugging and portfolio demos
+
+## Included MCP servers
+
+- `calendar`: list events and find free time
+- `tasks`: create and list tasks
+- `weather`: get a mock forecast
+
+## Setup
+
+```powershell
+cd mcp-langgraph-agent
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+```
+
+Run the deterministic demo:
+
+```powershell
+python -m mcp_agent.cli "Check my calendar and create a task for my next meeting"
+```
+
+Run tests:
+
+```powershell
+pytest
+```
+
+For model-backed planning, set `OPENAI_API_KEY` and run:
+
+```powershell
+python -m mcp_agent.cli "What should I do before my next meeting?" --model
+```
+
+## Architecture
+
+```text
+User request
+    |
+    v
+LangGraph planner ----> MCP tool registry
+    |                         |
+    |                  calendar / tasks / weather
+    v                         |
+Tool execution <-------------+
+    |
+    v
+Final response + trace
+```
+
+The project intentionally keeps server processes separate from the client. This
+makes the MCP boundary visible and makes it easy to replace the demo servers with
+real services later.
+
+## Suggested extensions
+
+1. Add approval before mutating tools such as `create_task`.
+2. Add a fourth server using Streamable HTTP.
+3. Persist graph checkpoints in SQLite.
+4. Add tool-level latency and failure metrics.
+5. Add contract tests against real external MCP servers.

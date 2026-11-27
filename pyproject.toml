@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-langgraph-agent"
+version = "0.1.0"
+description = "A multi-server MCP client orchestrated with LangGraph"
+requires-python = ">=3.11"
+dependencies = [
+  "mcp>=1.29.0",
+  "langgraph>=0.6.0",
+  "langchain-core>=0.3.0",
+]
+
+[project.optional-dependencies]
+model = ["langchain-openai>=0.3.0"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
