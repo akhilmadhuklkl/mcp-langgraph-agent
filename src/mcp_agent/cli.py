@@ -4,6 +4,7 @@ import asyncio
 from .graph import build_graph
 from .catalog import format_catalog
 from .mcp_client import MCPToolRegistry
+from .trace import format_trace
 
 
 async def run(request: str) -> None:
@@ -12,6 +13,7 @@ async def run(request: str) -> None:
     try:
         print(format_catalog(registry.catalog()))
         result = await build_graph(registry).ainvoke({"request": request})
+        print("\n" + format_trace(result.get("trace", [])))
         print("\n" + result["answer"])
     finally:
         await registry.close()

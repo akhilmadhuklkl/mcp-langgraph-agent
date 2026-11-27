@@ -1,4 +1,5 @@
 from typing import Any, TypedDict
+from time import perf_counter
 
 from langgraph.graph import END, START, StateGraph
 
@@ -11,18 +12,36 @@ class AgentState(TypedDict, total=False):
     plan: list[dict[str, Any]]
     cursor: int
     results: list[dict[str, Any]]
+    trace: list[dict[str, Any]]
     answer: str
 
 
 def build_graph(registry: MCPToolRegistry):
     def plan_node(state: AgentState) -> AgentState:
-        return {"plan": deterministic_plan(state["request"]), "cursor": 0, "results": []}
+        return {"plan": deterministic_plan(state["request"]), "cursor": 0, "results": [], "trace": []}
 
     async def execute_node(state: AgentState) -> AgentState:
         step = state["plan"][state["cursor"]]
-        value = await registry.call(step["tool"], step["arguments"])
-        results = [*state.get("results", []), {"tool": step["tool"], "result": value}]
-        return {"cursor": state["cursor"] + 1, "results": results}
+        started = perf_counter()
+        trace_item: dict[str, Any] = {
+            "tool": step["tool"],
+            "arguments": step["arguments"],
+            "status": "success",
+        }
+        try:
+            value = await registry.call(step["tool"], step["arguments"])
+            results = [*state.get("results", []), {"tool": step["tool"], "result": value}]
+        except Exception as exc:  # noqa: BLE001 - trace and surface tool failures
+            value = {"error": str(exc)}
+            trace_item["status"] = "error"
+            trace_item["error"] = str(exc)
+            results = [*state.get("results", []), {"tool": step["tool"], "result": value}]
+        trace_item["duration_ms"] = (perf_counter() - started) * 1000
+        return {
+            "cursor": state["cursor"] + 1,
+            "results": results,
+            "trace": [*state.get("trace", []), trace_item],
+        }
 
     def should_continue(state: AgentState) -> str:
         return "execute" if state["cursor"] < len(state["plan"]) else "finish"
