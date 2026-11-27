@@ -61,6 +61,17 @@ Gmail and Google Drive follow the same pattern as GitHub. Set
 used. Keep OAuth credentials in the external servers' environments and never
 commit them.
 
+For the Google-hosted MCP servers, use the included wrapper after setting
+`GOOGLE_OAUTH_CLIENT_JSON` to the downloaded client JSON path:
+
+```powershell
+$env:GOOGLE_OAUTH_CLIENT_JSON = "C:\Users\User\Downloads\client_secret_<client-id>.json"
+$env:GMAIL_MCP_COMMAND = "powershell"
+$env:GMAIL_MCP_ARGS = "-ExecutionPolicy Bypass -File scripts\run-google-mcp.ps1 https://gmailmcp.googleapis.com/mcp/v1"
+$env:GOOGLE_DRIVE_MCP_COMMAND = "powershell"
+$env:GOOGLE_DRIVE_MCP_ARGS = "-ExecutionPolicy Bypass -File scripts\run-google-mcp.ps1 https://drivemcp.googleapis.com/mcp/v1"
+```
+
 Resume a pending run after a human decision:
 
 ```powershell
