@@ -44,7 +44,7 @@ async def connect_registry() -> MCPToolRegistry:
     return registry
 
 
-async def run_request(request: str, planner_mode: str) -> None:
+async def run_request(request: str, planner_mode: str, json_output: bool = False) -> None:
     store = RunStore()
     state = initial_state(request, planner_mode)
     run_id = store.create(request, state)
@@ -54,6 +54,19 @@ async def run_request(request: str, planner_mode: str) -> None:
     try:
         result = await build_graph(registry).ainvoke(state)
         store.save(run_id, result)
+        if json_output:
+            print(
+                json.dumps(
+                    {
+                        "run_id": run_id,
+                        "answer": result["answer"],
+                        "trace": result.get("trace", []),
+                        "metrics": registry.metrics(),
+                    },
+                    indent=2,
+                )
+            )
+            return
         print(f"Run ID: {run_id}")
         print(format_trace(result.get("trace", [])))
         print_metrics(registry.metrics())
@@ -120,6 +133,7 @@ def main() -> None:
     run_parser = subparsers.add_parser("run", help="start a new agent run")
     run_parser.add_argument("request")
     run_parser.add_argument("--model", action="store_true")
+    run_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     history_parser = subparsers.add_parser("history", help="list recent runs")
     history_parser.add_argument("--limit", type=int, default=10)
     resume_parser = subparsers.add_parser("resume", help="resume a pending run")
@@ -150,7 +164,7 @@ def main() -> None:
     elif args.command == "history":
         print(format_history(store.recent(args.limit)))
     elif args.command == "run":
-        asyncio.run(run_request(args.request, "llm" if args.model else "deterministic"))
+        asyncio.run(run_request(args.request, "llm" if args.model else "deterministic", args.json))
     else:
         asyncio.run(resume_request(args.run_id, args.approve))
 
