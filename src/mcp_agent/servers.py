@@ -29,9 +29,19 @@ def gmail_server() -> FastMCP:
         return [{"from": "team@example.com", "subject": "MCP project update", "snippet": "Please review the latest agent workflow.", "query": query}]
 
     @server.tool()
+    def search_threads(query: str) -> list[dict[str, str]]:
+        """Real-server-compatible alias for searching the local demo inbox."""
+        return search_emails(query)
+
+    @server.tool()
     def draft_email(to: str, subject: str, body: str) -> dict[str, str]:
         """Create a local demo email draft without sending it."""
         return {"to": to, "subject": subject, "body": body, "status": "draft"}
+
+    @server.tool()
+    def create_draft(to: str, subject: str, body: str) -> dict[str, str]:
+        """Real-server-compatible alias for creating a local demo draft."""
+        return draft_email(to, subject, body)
 
     return server
 
@@ -43,6 +53,11 @@ def drive_server() -> FastMCP:
     def search_pages(query: str) -> list[dict[str, str]]:
         """Search the local demo Google Drive workspace."""
         return [{"name": "MCP Agent Project Plan", "mime_type": "document", "url": "drive://mcp-agent-plan", "match": query}]
+
+    @server.tool()
+    def search_files(query: str) -> list[dict[str, str]]:
+        """Real-server-compatible alias for searching local demo Drive files."""
+        return search_pages(query)
 
     @server.tool()
     def create_file(name: str, content: str) -> dict[str, str]:
