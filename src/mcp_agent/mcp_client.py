@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import time
 from contextlib import AsyncExitStack
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,6 +38,7 @@ class MCPToolRegistry:
         self.tools: dict[str, ToolHandle] = {}
         self.timeout_seconds = timeout_seconds
         self.max_retries = retry_count(max_retries)
+        self._metrics: dict[str, dict[str, float]] = {}
 
     async def connect(self, names: list[str]) -> None:
         root = Path(__file__).resolve().parent
@@ -81,8 +83,11 @@ class MCPToolRegistry:
     async def call(self, namespaced_name: str, arguments: dict[str, Any]) -> Any:
         handle = self.tools[namespaced_name]
         self._validate_arguments(handle, arguments)
+        started = time.perf_counter()
+        attempts = 0
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 2):
+            attempts = attempt
             try:
                 result = await asyncio.wait_for(
                     self.sessions[handle.server].call_tool(handle.name, arguments),
@@ -92,12 +97,15 @@ class MCPToolRegistry:
             except Exception as exc:
                 last_error = exc
                 if attempt > self.max_retries:
+                    self._record_metric(namespaced_name, started, attempts, success=False)
                     raise RuntimeError(
                         f"MCP tool {namespaced_name} failed after {attempt} attempt(s): {exc}"
                     ) from exc
                 await asyncio.sleep(retry_delay(attempt))
         else:  # pragma: no cover - loop always returns or raises
+            self._record_metric(namespaced_name, started, attempts, success=False)
             raise RuntimeError(f"MCP tool {namespaced_name} failed: {last_error}")
+        self._record_metric(namespaced_name, started, attempts, success=True)
         values = []
         for content in result.content:
             if hasattr(content, "text"):
@@ -105,6 +113,32 @@ class MCPToolRegistry:
             elif hasattr(content, "data"):
                 values.append(content.data)
         return values[0] if len(values) == 1 else values
+
+    def metrics(self) -> list[dict[str, Any]]:
+        """Return aggregate latency and reliability metrics by tool."""
+        return [
+            {
+                "tool": name,
+                "calls": int(values["calls"]),
+                "successes": int(values["successes"]),
+                "failures": int(values["failures"]),
+                "retries": int(values["retries"]),
+                "average_duration_ms": values["duration_ms"] / values["calls"],
+            }
+            for name, values in sorted(self._metrics.items())
+        ]
+
+    def _record_metric(
+        self, namespaced_name: str, started: float, attempts: int, success: bool
+    ) -> None:
+        values = self._metrics.setdefault(
+            namespaced_name,
+            {"calls": 0, "successes": 0, "failures": 0, "retries": 0, "duration_ms": 0},
+        )
+        values["calls"] += 1
+        values["successes" if success else "failures"] += 1
+        values["retries"] += max(0, attempts - 1)
+        values["duration_ms"] += (time.perf_counter() - started) * 1000
 
     @staticmethod
     def _validate_arguments(handle: ToolHandle, arguments: dict[str, Any]) -> None:

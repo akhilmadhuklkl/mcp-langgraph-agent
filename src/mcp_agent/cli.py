@@ -46,6 +46,7 @@ async def run_request(request: str, planner_mode: str) -> None:
         store.save(run_id, result)
         print(f"Run ID: {run_id}")
         print(format_trace(result.get("trace", [])))
+        print_metrics(registry.metrics())
         print("\n" + result["answer"])
     finally:
         await registry.close()
@@ -59,6 +60,18 @@ async def catalog_request() -> None:
             print(f"  - {item['name']} | inputs={', '.join(item['inputs']) or 'none'}")
     finally:
         await registry.close()
+
+
+def print_metrics(metrics: list[dict[str, object]]) -> None:
+    if not metrics:
+        return
+    print("\nTool metrics:")
+    for item in metrics:
+        print(
+            f"  {item['tool']} | calls={item['calls']} | successes={item['successes']} "
+            f"| failures={item['failures']} | retries={item['retries']} "
+            f"| average={item['average_duration_ms']:.2f}ms"
+        )
 
 
 def print_plan(request: str) -> None:
@@ -77,6 +90,7 @@ async def resume_request(run_id: str, approved: bool) -> None:
         result = await resume_workflow(registry, state, approved)
         store.save(run_id, result)
         print(format_trace(result.get("trace", [])))
+        print_metrics(registry.metrics())
         print("\n" + result["answer"])
     finally:
         await registry.close()
