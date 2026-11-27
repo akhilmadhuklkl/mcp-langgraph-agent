@@ -1,10 +1,22 @@
 from typing import Any
 
-SENSITIVE_KEYS = {"body", "content", "password", "secret", "token", "access_token", "refresh_token"}
+SENSITIVE_KEYS = {
+    "api_key",
+    "authorization",
+    "body",
+    "client_secret",
+    "content",
+    "password",
+    "secret",
+    "token",
+    "access_token",
+    "refresh_token",
+}
 
 
 def _redact_value(key: str, value: Any) -> Any:
-    if key.lower() in SENSITIVE_KEYS:
+    normalized_key = key.lower().replace("-", "_")
+    if normalized_key in SENSITIVE_KEYS or normalized_key.endswith(("_key", "_secret", "_token")):
         return "[REDACTED]"
     if isinstance(value, dict):
         return {nested_key: _redact_value(nested_key, nested_value) for nested_key, nested_value in value.items()}

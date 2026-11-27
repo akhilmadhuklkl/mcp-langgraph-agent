@@ -14,6 +14,11 @@ def test_redact_arguments_recurses_into_nested_values():
     assert result == {"message": {"content": "[REDACTED]", "parts": [{"token": "[REDACTED]"}]}}
 
 
+def test_redact_arguments_covers_auth_variants():
+    result = redact_arguments({"api-key": "a", "client_secret": "b", "authorization": "c"})
+    assert result == {"api-key": "[REDACTED]", "client_secret": "[REDACTED]", "authorization": "[REDACTED]"}
+
+
 def test_formats_successful_trace():
     output = format_trace([
         {
