@@ -5,6 +5,7 @@ from langgraph.graph import END, START, StateGraph
 
 from .mcp_client import MCPToolRegistry
 from .execution import resolve_arguments
+from .policy import approval_message, requires_approval
 from .planner import deterministic_plan, llm_plan
 from .state import AgentState
 
@@ -28,6 +29,20 @@ def build_graph(registry: MCPToolRegistry):
         step = state["plan"][state["current_step"]]
         started = perf_counter()
         resolved_arguments = resolve_arguments(step["arguments"], state.get("results", []))
+        if requires_approval(step["tool"]) and state.get("approval_status") != "approved":
+            return {
+                "approval_status": "pending",
+                "answer": approval_message(step["tool"], resolved_arguments),
+                "trace": [
+                    *state.get("trace", []),
+                    {
+                        "tool": step["tool"],
+                        "arguments": resolved_arguments,
+                        "status": "approval_required",
+                        "duration_ms": 0.0,
+                    },
+                ],
+            }
         trace_item: dict[str, Any] = {
             "tool": step["tool"],
             "arguments": resolved_arguments,
@@ -53,6 +68,8 @@ def build_graph(registry: MCPToolRegistry):
         }
 
     def should_continue(state: AgentState) -> str:
+        if state.get("approval_status") == "pending":
+            return "approval"
         return "execute" if state["current_step"] < len(state["plan"]) else "finish"
 
     def finish_node(state: AgentState) -> AgentState:
@@ -67,7 +84,7 @@ def build_graph(registry: MCPToolRegistry):
     workflow.add_node("execute", execute_node)
     workflow.add_node("finish", finish_node)
     workflow.add_edge(START, "plan")
-    workflow.add_conditional_edges("plan", should_continue, {"execute": "execute", "finish": "finish"})
-    workflow.add_conditional_edges("execute", should_continue, {"execute": "execute", "finish": "finish"})
+    workflow.add_conditional_edges("plan", should_continue, {"execute": "execute", "finish": "finish", "approval": END})
+    workflow.add_conditional_edges("execute", should_continue, {"execute": "execute", "finish": "finish", "approval": END})
     workflow.add_edge("finish", END)
     return workflow.compile()

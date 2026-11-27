@@ -12,6 +12,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Explicit workflow state for plans, results, errors, and approvals
 - Optional LLM planner with structured tool plans
 - Result-aware execution where later tools can consume earlier results
+- Approval gates before mutating GitHub, Gmail, or Notion tools
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -53,6 +54,10 @@ default for local development and tests.
 
 Multi-step plans can reference the latest tool output with `${last_result}`.
 For example, a GitHub search can feed its result into a related Notion search.
+
+Mutating tools are policy-protected. The graph pauses with
+`approval_status="pending"` before executing tools such as
+`gmail.draft_email` or `notion.create_page`.
 
 Run tests:
 
