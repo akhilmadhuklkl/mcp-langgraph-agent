@@ -7,12 +7,26 @@ name = "mcp-langgraph-agent"
 version = "0.1.0"
 description = "A multi-server MCP client orchestrated with LangGraph"
 requires-python = ">=3.11"
+readme = "README.md"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
 dependencies = [
   "setuptools>=84.1",
   "mcp>=1.29.0,<2.0",
   "langgraph>=0.6.0",
   "langchain-core>=0.3.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/akhilmadhuklkl/mcp-langgraph-agent"
+Issues = "https://github.com/akhilmadhuklkl/mcp-langgraph-agent/issues"
 
 [project.optional-dependencies]
 model = ["langchain-openai>=0.3.0", "pydantic>=2.0"]
