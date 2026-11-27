@@ -49,6 +49,12 @@ List recent runs:
 python -m mcp_agent.cli history
 ```
 
+Check external MCP readiness without exposing credentials:
+
+```powershell
+python -m mcp_agent.cli doctor
+```
+
 Resume a pending run after a human decision:
 
 ```powershell

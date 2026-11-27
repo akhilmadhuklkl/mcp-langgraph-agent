@@ -3,6 +3,7 @@ import asyncio
 
 from .cli_helpers import format_history
 from .config import github_server_config
+from .doctor import format_checks, readiness_checks
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
 from .persistence import RunStore
@@ -69,9 +70,12 @@ def main() -> None:
     decision = resume_parser.add_mutually_exclusive_group(required=True)
     decision.add_argument("--approve", action="store_true")
     decision.add_argument("--reject", action="store_true")
+    subparsers.add_parser("doctor", help="check MCP integration readiness")
     args = parser.parse_args()
     store = RunStore(DB_PATH)
-    if args.command == "history":
+    if args.command == "doctor":
+        print(format_checks(readiness_checks()))
+    elif args.command == "history":
         print(format_history(store.recent(args.limit)))
     elif args.command == "run":
         asyncio.run(run_request(args.request, "llm" if args.model else "deterministic"))
