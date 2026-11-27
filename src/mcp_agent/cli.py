@@ -149,6 +149,7 @@ def main() -> None:
     run_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     history_parser = subparsers.add_parser("history", help="list recent runs")
     history_parser.add_argument("--limit", type=int, default=10)
+    history_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     resume_parser = subparsers.add_parser("resume", help="resume a pending run")
     resume_parser.add_argument("run_id")
     decision = resume_parser.add_mutually_exclusive_group(required=True)
@@ -176,7 +177,8 @@ def main() -> None:
     elif args.command == "plan":
         print_plan(args.request, args.json)
     elif args.command == "history":
-        print(format_history(store.recent(args.limit)))
+        runs = store.recent(args.limit)
+        print(json.dumps(runs, indent=2, default=str) if args.json else format_history(runs))
     elif args.command == "run":
         asyncio.run(run_request(args.request, "llm" if args.model else "deterministic", args.json))
     else:

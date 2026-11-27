@@ -196,6 +196,12 @@ Resume an approved or rejected pending run as JSON with:
 python -m mcp_agent.cli resume <run-id> --approve --json
 ```
 
+List persisted runs as JSON with:
+
+```powershell
+python -m mcp_agent.cli history --json
+```
+
 Run tests:
 
 ```powershell
