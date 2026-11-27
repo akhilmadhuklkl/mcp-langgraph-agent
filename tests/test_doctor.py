@@ -13,3 +13,4 @@ def test_format_checks_is_readable():
     output = format_checks(readiness_checks())
     assert output.startswith("MCP agent readiness:")
     assert "GitHub command" in output
+    assert "Google OAuth client" in output
