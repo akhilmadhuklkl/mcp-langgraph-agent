@@ -14,3 +14,10 @@ def test_format_checks_is_readable():
     assert output.startswith("MCP agent readiness:")
     assert "GitHub command" in output
     assert "Google OAuth client" in output
+
+
+def test_http_server_check_validates_optional_url(monkeypatch):
+    monkeypatch.setenv("MCP_HTTP_SERVER_URL", "ftp://example.test/mcp")
+    output = format_checks(readiness_checks())
+    assert "Streamable HTTP server: invalid" in output
+    assert "URL must use http:// or https://" in output

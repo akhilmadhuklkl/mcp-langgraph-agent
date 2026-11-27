@@ -1,8 +1,14 @@
 import os
 import shutil
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
-from .config import drive_server_config, github_server_config, gmail_server_config
+from .config import (
+    drive_server_config,
+    github_server_config,
+    gmail_server_config,
+    streamable_http_server_config,
+)
 
 
 @dataclass(frozen=True)
@@ -20,6 +26,8 @@ def readiness_checks() -> list[Check]:
     drive_config = drive_server_config()
     oauth_json = os.getenv("GOOGLE_OAUTH_CLIENT_JSON")
     oauth_ready = bool(oauth_json and os.path.isfile(oauth_json))
+    http_config = streamable_http_server_config()
+    http_ready = bool(http_config and urlparse(http_config.url).scheme in {"http", "https"})
     return [
         Check("Docker", "ready" if docker else "missing", "Docker executable detected" if docker else "Install Docker or use a native MCP binary"),
         Check("GitHub command", "ready" if configured else "mock", configured.command if configured else "External command is unset; local mock server will be used"),
@@ -27,6 +35,11 @@ def readiness_checks() -> list[Check]:
         Check("Gmail command", "ready" if gmail_config else "mock", gmail_config.command if gmail_config else "External command is unset; local mock server will be used"),
         Check("Google Drive command", "ready" if drive_config else "mock", drive_config.command if drive_config else "External command is unset; local mock server will be used"),
         Check("Google OAuth client", "ready" if oauth_ready else "missing", "OAuth client JSON found" if oauth_ready else "Set GOOGLE_OAUTH_CLIENT_JSON to the downloaded client JSON path"),
+        Check(
+            "Streamable HTTP server",
+            "ready" if http_ready else "disabled" if not http_config else "invalid",
+            http_config.url if http_ready else "Not configured" if not http_config else "URL must use http:// or https://",
+        ),
     ]
 
 
