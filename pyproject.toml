@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A multi-server MCP client orchestrated with LangGraph"
 requires-python = ">=3.11"
 dependencies = [
-  "mcp>=1.29.0",
+  "mcp>=1.29.0,<2.0",
   "langgraph>=0.6.0",
   "langchain-core>=0.3.0",
 ]
