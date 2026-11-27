@@ -55,6 +55,12 @@ Check external MCP readiness without exposing credentials:
 python -m mcp_agent.cli doctor
 ```
 
+Discover the exact tools exposed by the configured MCP servers:
+
+```powershell
+python -m mcp_agent.cli catalog
+```
+
 Gmail and Google Drive follow the same pattern as GitHub. Set
 `GMAIL_MCP_COMMAND` or `GOOGLE_DRIVE_MCP_COMMAND` and optionally the matching
 `*_ARGS` variable to connect external servers. If unset, local mock servers are
