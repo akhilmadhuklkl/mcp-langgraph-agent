@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 
+from . import __version__
 from .cli_helpers import format_history
 from .config import (
     drive_server_config,
@@ -106,6 +107,7 @@ async def resume_request(run_id: str, approved: bool) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="MCP LangGraph agent")
+    parser.add_argument("--version", action="version", version=__version__)
     subparsers = parser.add_subparsers(dest="command", required=True)
     run_parser = subparsers.add_parser("run", help="start a new agent run")
     run_parser.add_argument("request")
