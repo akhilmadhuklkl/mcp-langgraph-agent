@@ -1,5 +1,7 @@
 # MCP Multi-Server Agent
 
+[![CI](https://github.com/akhilmadhuklkl/mcp-langgraph-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/akhilmadhuklkl/mcp-langgraph-agent/actions/workflows/ci.yml)
+
 A Python AI agent that connects to multiple MCP servers, discovers their tools,
 and routes multi-step tasks through a LangGraph workflow.
 
@@ -23,6 +25,7 @@ See the [architecture guide](docs/architecture.md) for the system design.
 - Deterministic demo mode that does not require an API key
 - Optional OpenAI-backed planning and tool selection
 - Explicit tool-call trace for debugging and portfolio demos
+- Automated CI across Python 3.11, 3.12, and 3.13 with Ruff, pip-audit, and coverage checks
 
 ## Included MCP servers
 
