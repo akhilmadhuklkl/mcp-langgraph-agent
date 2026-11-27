@@ -17,7 +17,7 @@ async def main() -> None:
             print(f"- {tool['name']} inputs={tool['inputs']}")
         result = await registry.call(
             "gmail.search_threads",
-            {"query": "MCP", "pageSize": 1, "view": "metadata"},
+            {"query": "MCP", "pageSize": 1},
         )
         print("Read-only search succeeded:", result)
     finally:
