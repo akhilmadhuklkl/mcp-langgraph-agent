@@ -19,6 +19,14 @@ def test_redact_arguments_covers_auth_variants():
     assert result == {"api-key": "[REDACTED]", "client_secret": "[REDACTED]", "authorization": "[REDACTED]"}
 
 
+def test_format_trace_redacts_legacy_trace_arguments():
+    output = format_trace(
+        [{"tool": "gmail.create_draft", "status": "error", "arguments": {"body": "private"}, "error": "token=secret", "duration_ms": 1.0}]
+    )
+    assert "private" not in output
+    assert "token=secret" in output
+
+
 def test_formats_successful_trace():
     output = format_trace([
         {

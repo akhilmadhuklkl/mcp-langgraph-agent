@@ -38,8 +38,9 @@ def format_trace(trace: list[dict[str, Any]]) -> str:
     for index, item in enumerate(trace, start=1):
         lines.append(
             f"  {index}. {item['tool']} | status={item['status']} "
-            f"| duration={item['duration_ms']:.2f}ms | arguments={item['arguments']}"
+            f"| duration={item['duration_ms']:.2f}ms "
+            f"| arguments={redact_arguments(item['arguments'])}"
         )
         if item.get("error"):
-            lines.append(f"     error: {item['error']}")
+            lines.append(f"     error: {redact_arguments({'error': item['error']})['error']}")
     return "\n".join(lines)
