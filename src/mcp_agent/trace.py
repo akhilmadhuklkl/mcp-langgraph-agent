@@ -1,5 +1,15 @@
 from typing import Any
 
+SENSITIVE_KEYS = {"body", "content", "password", "secret", "token", "access_token", "refresh_token"}
+
+
+def redact_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
+    """Return trace-safe arguments without common credential or message fields."""
+    return {
+        key: "[REDACTED]" if key.lower() in SENSITIVE_KEYS else value
+        for key, value in arguments.items()
+    }
+
 
 def format_trace(trace: list[dict[str, Any]]) -> str:
     """Format tool execution records for the CLI."""

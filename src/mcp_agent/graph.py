@@ -8,6 +8,7 @@ from .mcp_client import MCPToolRegistry
 from .planner import deterministic_plan, llm_plan
 from .policy import approval_message, requires_approval
 from .state import AgentState, apply_approval_decision
+from .trace import redact_arguments
 
 
 def build_graph(registry: MCPToolRegistry):
@@ -31,15 +32,16 @@ def build_graph(registry: MCPToolRegistry):
         step = state["plan"][state["current_step"]]
         started = perf_counter()
         resolved_arguments = resolve_arguments(step["arguments"], state.get("results", []))
+        trace_arguments = redact_arguments(resolved_arguments)
         if requires_approval(step["tool"]) and state.get("approval_status") != "approved":
             return {
                 "approval_status": "pending",
-                "answer": approval_message(step["tool"], resolved_arguments),
+                "answer": approval_message(step["tool"], trace_arguments),
                 "trace": [
                     *state.get("trace", []),
                     {
                         "tool": step["tool"],
-                        "arguments": resolved_arguments,
+                        "arguments": trace_arguments,
                         "status": "approval_required",
                         "duration_ms": 0.0,
                     },
@@ -47,7 +49,7 @@ def build_graph(registry: MCPToolRegistry):
             }
         trace_item: dict[str, Any] = {
             "tool": step["tool"],
-            "arguments": resolved_arguments,
+            "arguments": trace_arguments,
             "status": "success",
         }
         try:

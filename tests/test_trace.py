@@ -1,4 +1,12 @@
-from mcp_agent.trace import format_trace
+from mcp_agent.trace import format_trace, redact_arguments
+
+
+def test_redact_arguments_hides_sensitive_fields():
+    assert redact_arguments({"query": "MCP", "body": "private", "token": "secret"}) == {
+        "query": "MCP",
+        "body": "[REDACTED]",
+        "token": "[REDACTED]",
+    }
 
 
 def test_formats_successful_trace():
