@@ -11,7 +11,9 @@ def deterministic_plan(request: str) -> list[dict[str, Any]]:
         plan.append({"tool": "drive.search_files", "arguments": {"query": query}})
     if "email" in text or "gmail" in text or "inbox" in text:
         query = "${last_result}" if plan else "MCP"
-        plan.append({"tool": "gmail.search_emails", "arguments": {"query": query}})
+        # The official Gmail MCP server exposes search_threads; the local mock
+        # keeps search_emails for backward-compatible offline tests.
+        plan.append({"tool": "gmail.search_threads", "arguments": {"query": query}})
     if not plan:
         plan.append({"tool": "github.search_issues", "arguments": {"query": "open"}})
     return plan
