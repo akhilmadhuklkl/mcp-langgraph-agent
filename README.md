@@ -204,6 +204,9 @@ The discovered tools use the same `server.tool` namespace and follow the same
 validation, retry, timeout, tracing, approval, and metrics behavior as stdio
 servers.
 
+To make an HTTP server available automatically to the CLI, set
+`MCP_HTTP_SERVER_NAME` and `MCP_HTTP_SERVER_URL` in the environment.
+
 ## Completed engineering extensions
 
 - Approval before mutating tools, with resumable decisions.
