@@ -11,6 +11,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Execution traces with tool arguments, status, results, and timing
 - Explicit workflow state for plans, results, errors, and approvals
 - Optional LLM planner with structured tool plans
+- Result-aware execution where later tools can consume earlier results
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -49,6 +50,9 @@ python -m mcp_agent.cli "Find GitHub issues and related Notion notes" --model
 The LLM receives the discovered MCP tool catalog and must return exact
 namespaced tool names plus JSON arguments. Deterministic planning remains the
 default for local development and tests.
+
+Multi-step plans can reference the latest tool output with `${last_result}`.
+For example, a GitHub search can feed its result into a related Notion search.
 
 Run tests:
 

@@ -4,6 +4,7 @@ from time import perf_counter
 from langgraph.graph import END, START, StateGraph
 
 from .mcp_client import MCPToolRegistry
+from .execution import resolve_arguments
 from .planner import deterministic_plan, llm_plan
 from .state import AgentState
 
@@ -26,13 +27,14 @@ def build_graph(registry: MCPToolRegistry):
     async def execute_node(state: AgentState) -> AgentState:
         step = state["plan"][state["current_step"]]
         started = perf_counter()
+        resolved_arguments = resolve_arguments(step["arguments"], state.get("results", []))
         trace_item: dict[str, Any] = {
             "tool": step["tool"],
-            "arguments": step["arguments"],
+            "arguments": resolved_arguments,
             "status": "success",
         }
         try:
-            value = await registry.call(step["tool"], step["arguments"])
+            value = await registry.call(step["tool"], resolved_arguments)
             results = [*state.get("results", []), {"tool": step["tool"], "result": value}]
         except Exception as exc:  # noqa: BLE001 - trace and surface tool failures
             value = {"error": str(exc)}
