@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import json
 
 from . import __version__
 from .cli_helpers import format_history
@@ -61,9 +62,12 @@ async def run_request(request: str, planner_mode: str) -> None:
         await registry.close()
 
 
-async def catalog_request() -> None:
+async def catalog_request(json_output: bool = False) -> None:
     registry = await connect_registry()
     try:
+        if json_output:
+            print(json.dumps(registry.catalog(), indent=2))
+            return
         print("Discovered MCP tools:")
         for item in registry.catalog():
             print(f"  - {item['name']} | inputs={', '.join(item['inputs']) or 'none'}")
@@ -120,7 +124,8 @@ def main() -> None:
     decision.add_argument("--approve", action="store_true")
     decision.add_argument("--reject", action="store_true")
     subparsers.add_parser("doctor", help="check MCP integration readiness")
-    subparsers.add_parser("catalog", help="discover configured MCP tools")
+    catalog_parser = subparsers.add_parser("catalog", help="discover configured MCP tools")
+    catalog_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     plan_parser = subparsers.add_parser("plan", help="show a plan without executing it")
     plan_parser.add_argument("request")
     args = parser.parse_args()
@@ -128,7 +133,7 @@ def main() -> None:
     if args.command == "doctor":
         print(format_checks(readiness_checks()))
     elif args.command == "catalog":
-        asyncio.run(catalog_request())
+        asyncio.run(catalog_request(args.json))
     elif args.command == "plan":
         print_plan(args.request)
     elif args.command == "history":

@@ -166,6 +166,12 @@ This validates that the expected tools are discoverable and accepts the same
 arguments used by the agent. It is intentionally opt-in and is not part of CI
 because it requires your external credentials.
 
+For integrations that need machine-readable discovery data, use:
+
+```powershell
+python -m mcp_agent.cli catalog --json
+```
+
 Run tests:
 
 ```powershell
