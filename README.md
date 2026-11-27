@@ -13,6 +13,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Optional LLM planner with structured tool plans
 - Result-aware execution where later tools can consume earlier results
 - Approval gates before mutating GitHub, Gmail, or Notion tools
+- Bounded MCP retries, exponential backoff, and per-call timeouts
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -64,6 +65,9 @@ state continues at the paused step; a rejected state ends safely without
 calling the mutating tool.
 
 The programmatic entry point is `resume_workflow(registry, state, approved)`.
+
+MCP calls default to a 30-second timeout and two retries. These values can be
+configured through `MCPToolRegistry(timeout_seconds=..., max_retries=...)`.
 
 Run tests:
 

@@ -3,9 +3,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 import sys
+import asyncio
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+from .reliability import retry_count, retry_delay
 
 
 @dataclass
@@ -27,10 +30,12 @@ class ToolHandle:
 class MCPToolRegistry:
     """Owns MCP sessions and exposes namespaced tools to the graph."""
 
-    def __init__(self) -> None:
+    def __init__(self, timeout_seconds: float = 30.0, max_retries: int = 2) -> None:
         self.stack = AsyncExitStack()
         self.sessions: dict[str, ClientSession] = {}
         self.tools: dict[str, ToolHandle] = {}
+        self.timeout_seconds = timeout_seconds
+        self.max_retries = retry_count(max_retries)
 
     async def connect(self, names: list[str]) -> None:
         root = Path(__file__).resolve().parent
@@ -67,7 +72,23 @@ class MCPToolRegistry:
 
     async def call(self, namespaced_name: str, arguments: dict[str, Any]) -> Any:
         handle = self.tools[namespaced_name]
-        result = await self.sessions[handle.server].call_tool(handle.name, arguments)
+        last_error: Exception | None = None
+        for attempt in range(1, self.max_retries + 2):
+            try:
+                result = await asyncio.wait_for(
+                    self.sessions[handle.server].call_tool(handle.name, arguments),
+                    timeout=self.timeout_seconds,
+                )
+                break
+            except Exception as exc:  # noqa: BLE001 - retry then surface the final error
+                last_error = exc
+                if attempt > self.max_retries:
+                    raise RuntimeError(
+                        f"MCP tool {namespaced_name} failed after {attempt} attempt(s): {exc}"
+                    ) from exc
+                await asyncio.sleep(retry_delay(attempt))
+        else:  # pragma: no cover - loop always returns or raises
+            raise RuntimeError(f"MCP tool {namespaced_name} failed: {last_error}")
         values = []
         for content in result.content:
             if hasattr(content, "text"):
