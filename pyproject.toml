@@ -16,7 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 model = ["langchain-openai>=0.3.0", "pydantic>=2.0"]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "pytest-cov>=6.0", "ruff>=0.8.0", "pip-audit>=2.7.0"]
+dev = ["build>=1.2.0", "pytest>=8.0", "pytest-asyncio>=0.23", "pytest-cov>=6.0", "ruff>=0.8.0", "pip-audit>=2.7.0"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
