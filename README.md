@@ -178,6 +178,12 @@ Preview a deterministic plan as JSON with:
 python -m mcp_agent.cli plan "Search Gmail for MCP" --json
 ```
 
+Check integration readiness as JSON with:
+
+```powershell
+python -m mcp_agent.cli doctor --json
+```
+
 Run tests:
 
 ```powershell

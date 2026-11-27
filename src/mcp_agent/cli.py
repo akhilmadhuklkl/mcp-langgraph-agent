@@ -127,7 +127,8 @@ def main() -> None:
     decision = resume_parser.add_mutually_exclusive_group(required=True)
     decision.add_argument("--approve", action="store_true")
     decision.add_argument("--reject", action="store_true")
-    subparsers.add_parser("doctor", help="check MCP integration readiness")
+    doctor_parser = subparsers.add_parser("doctor", help="check MCP integration readiness")
+    doctor_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     catalog_parser = subparsers.add_parser("catalog", help="discover configured MCP tools")
     catalog_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     plan_parser = subparsers.add_parser("plan", help="show a plan without executing it")
@@ -136,7 +137,12 @@ def main() -> None:
     args = parser.parse_args()
     store = RunStore(DB_PATH)
     if args.command == "doctor":
-        print(format_checks(readiness_checks()))
+        checks = readiness_checks()
+        print(
+            json.dumps([check.__dict__ for check in checks], indent=2)
+            if args.json
+            else format_checks(checks)
+        )
     elif args.command == "catalog":
         asyncio.run(catalog_request(args.json))
     elif args.command == "plan":
