@@ -3,6 +3,8 @@
 A Python AI agent that connects to multiple MCP servers, discovers their tools,
 and routes multi-step tasks through a LangGraph workflow.
 
+See the [architecture guide](docs/architecture.md) for the system design.
+
 ## What this demonstrates
 
 - One client connecting to three independent MCP servers over stdio
