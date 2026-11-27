@@ -7,7 +7,7 @@ from .mcp_client import MCPToolRegistry
 
 async def run(request: str) -> None:
     registry = MCPToolRegistry()
-    await registry.connect(["calendar", "tasks", "weather"])
+    await registry.connect(["github", "gmail", "notion"])
     try:
         print("Discovered tools:")
         for name in sorted(registry.tools):

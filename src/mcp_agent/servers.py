@@ -1,55 +1,57 @@
 from mcp.server.fastmcp import FastMCP
 
 
-def calendar_server() -> FastMCP:
-    server = FastMCP("calendar")
+def github_server() -> FastMCP:
+    server = FastMCP("github")
 
     @server.tool()
-    def list_events(day: str = "today") -> list[dict[str, str]]:
-        """List calendar events for a relative day."""
+    def search_issues(query: str = "") -> list[dict[str, str]]:
+        """Search open GitHub issues in the local demo workspace."""
         return [
-            {"title": "Design review", "start": "10:00", "end": "11:00", "day": day},
-            {"title": "Team standup", "start": "15:00", "end": "15:30", "day": day},
+            {"number": "#12", "title": "Add MCP approval checkpoints", "status": "open", "query": query},
+            {"number": "#18", "title": "Add tool latency metrics", "status": "open", "query": query},
         ]
 
     @server.tool()
-    def next_meeting() -> dict[str, str]:
-        """Return the next meeting."""
-        return {"title": "Design review", "start": "10:00", "day": "today"}
+    def get_pull_request(number: int) -> dict[str, str]:
+        """Get a pull request summary."""
+        return {"number": str(number), "title": "MCP client improvements", "status": "open", "reviewers": "2"}
 
     return server
 
 
-def tasks_server() -> FastMCP:
-    server = FastMCP("tasks")
-    tasks: list[dict[str, str]] = []
+def gmail_server() -> FastMCP:
+    server = FastMCP("gmail")
 
     @server.tool()
-    def create_task(title: str, priority: str = "normal") -> dict[str, str]:
-        """Create a task in the local demo task list."""
-        item = {"title": title, "priority": priority, "status": "open"}
-        tasks.append(item)
-        return item
+    def search_emails(query: str) -> list[dict[str, str]]:
+        """Search the local demo inbox."""
+        return [{"from": "team@example.com", "subject": "MCP project update", "snippet": "Please review the latest agent workflow.", "query": query}]
 
     @server.tool()
-    def list_tasks() -> list[dict[str, str]]:
-        """List open tasks."""
-        return tasks
+    def draft_email(to: str, subject: str, body: str) -> dict[str, str]:
+        """Create a local demo email draft without sending it."""
+        return {"to": to, "subject": subject, "body": body, "status": "draft"}
 
     return server
 
 
-def weather_server() -> FastMCP:
-    server = FastMCP("weather")
+def notion_server() -> FastMCP:
+    server = FastMCP("notion")
 
     @server.tool()
-    def forecast(city: str) -> dict[str, str]:
-        """Return a deterministic demo forecast."""
-        return {"city": city, "condition": "partly cloudy", "temperature": "27 C"}
+    def search_pages(query: str) -> list[dict[str, str]]:
+        """Search the local demo Notion workspace."""
+        return [{"title": "MCP Agent Project Plan", "url": "notion://mcp-agent-plan", "match": query}]
+
+    @server.tool()
+    def create_page(title: str, content: str) -> dict[str, str]:
+        """Create a local demo Notion page."""
+        return {"title": title, "content": content, "status": "created"}
 
     return server
 
 
 def main(server_name: str) -> None:
-    servers = {"calendar": calendar_server, "tasks": tasks_server, "weather": weather_server}
+    servers = {"github": github_server, "gmail": gmail_server, "notion": notion_server}
     servers[server_name]().run(transport="stdio")

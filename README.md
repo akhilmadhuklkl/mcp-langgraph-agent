@@ -8,16 +8,16 @@ and routes multi-step tasks through a LangGraph workflow.
 - One client connecting to three independent MCP servers over stdio
 - Dynamic `list_tools()` discovery and namespaced tool routing
 - LangGraph state-machine orchestration
-- Multi-step plans such as: "Check my calendar and create a task for anything urgent"
+- Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
 - Optional OpenAI-backed planning and tool selection
 - Explicit tool-call trace for debugging and portfolio demos
 
 ## Included MCP servers
 
-- `calendar`: list events and find free time
-- `tasks`: create and list tasks
-- `weather`: get a mock forecast
+- `github`: search issues and inspect pull requests
+- `gmail`: search email and create drafts without sending
+- `notion`: search project pages and create notes
 
 ## Setup
 
@@ -31,7 +31,7 @@ pip install -e ".[dev]"
 Run the deterministic demo:
 
 ```powershell
-python -m mcp_agent.cli "Check my calendar and create a task for my next meeting"
+python -m mcp_agent.cli "Check GitHub issues and my Gmail inbox"
 ```
 
 Run tests:
@@ -54,7 +54,7 @@ User request
     v
 LangGraph planner ----> MCP tool registry
     |                         |
-    |                  calendar / tasks / weather
+    |                  GitHub / Gmail / Notion
     v                         |
 Tool execution <-------------+
     |
