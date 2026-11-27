@@ -2,6 +2,7 @@ import argparse
 import asyncio
 
 from .graph import build_graph
+from .catalog import format_catalog
 from .mcp_client import MCPToolRegistry
 
 
@@ -9,9 +10,7 @@ async def run(request: str) -> None:
     registry = MCPToolRegistry()
     await registry.connect(["github", "gmail", "notion"])
     try:
-        print("Discovered tools:")
-        for name in sorted(registry.tools):
-            print(f"  - {name}")
+        print(format_catalog(registry.catalog()))
         result = await build_graph(registry).ainvoke({"request": request})
         print("\n" + result["answer"])
     finally:

@@ -15,6 +15,14 @@ class ToolHandle:
     description: str
     schema: dict[str, Any]
 
+    @property
+    def qualified_name(self) -> str:
+        return f"{self.server}.{self.name}"
+
+    @property
+    def input_names(self) -> list[str]:
+        return sorted(self.schema.get("properties", {}).keys())
+
 
 class MCPToolRegistry:
     """Owns MCP sessions and exposes namespaced tools to the graph."""
@@ -44,6 +52,18 @@ class MCPToolRegistry:
                     description=tool.description or "",
                     schema=tool.inputSchema,
                 )
+
+    def catalog(self) -> list[dict[str, Any]]:
+        """Return stable, presentation-friendly metadata for discovered tools."""
+        return [
+            {
+                "name": handle.qualified_name,
+                "server": handle.server,
+                "description": handle.description,
+                "inputs": handle.input_names,
+            }
+            for handle in sorted(self.tools.values(), key=lambda item: item.qualified_name)
+        ]
 
     async def call(self, namespaced_name: str, arguments: dict[str, Any]) -> Any:
         handle = self.tools[namespaced_name]

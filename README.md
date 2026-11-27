@@ -7,6 +7,7 @@ and routes multi-step tasks through a LangGraph workflow.
 
 - One client connecting to three independent MCP servers over stdio
 - Dynamic `list_tools()` discovery and namespaced tool routing
+- Human-readable tool catalog with descriptions and input schemas
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
