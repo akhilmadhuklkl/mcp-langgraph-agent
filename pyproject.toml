@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-model = ["langchain-openai>=0.3.0"]
+model = ["langchain-openai>=0.3.0", "pydantic>=2.0"]
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
 
 [tool.pytest.ini_options]

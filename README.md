@@ -10,6 +10,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Human-readable tool catalog with descriptions and input schemas
 - Execution traces with tool arguments, status, results, and timing
 - Explicit workflow state for plans, results, errors, and approvals
+- Optional LLM planner with structured tool plans
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -36,6 +37,18 @@ Run the deterministic demo:
 ```powershell
 python -m mcp_agent.cli "Check GitHub issues and my Gmail inbox"
 ```
+
+Use the model-backed planner when the optional dependency and `OPENAI_API_KEY`
+are configured:
+
+```powershell
+pip install -e ".[model]"
+python -m mcp_agent.cli "Find GitHub issues and related Notion notes" --model
+```
+
+The LLM receives the discovered MCP tool catalog and must return exact
+namespaced tool names plus JSON arguments. Deterministic planning remains the
+default for local development and tests.
 
 Run tests:
 

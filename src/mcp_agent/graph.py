@@ -4,14 +4,18 @@ from time import perf_counter
 from langgraph.graph import END, START, StateGraph
 
 from .mcp_client import MCPToolRegistry
-from .planner import deterministic_plan
+from .planner import deterministic_plan, llm_plan
 from .state import AgentState
 
 
 def build_graph(registry: MCPToolRegistry):
-    def plan_node(state: AgentState) -> AgentState:
+    async def plan_node(state: AgentState) -> AgentState:
+        if state.get("planner_mode") == "llm":
+            plan = await llm_plan(state["request"], registry.catalog())
+        else:
+            plan = deterministic_plan(state["request"])
         return {
-            "plan": deterministic_plan(state["request"]),
+            "plan": plan,
             "current_step": 0,
             "results": [],
             "trace": [],
