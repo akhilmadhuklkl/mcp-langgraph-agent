@@ -8,6 +8,7 @@ and routes multi-step tasks through a LangGraph workflow.
 See the [architecture guide](docs/architecture.md) for the system design.
 See the [security policy](SECURITY.md) for credential-handling and reporting guidance.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull-request guidelines.
+See [CHANGELOG.md](CHANGELOG.md) for the project history.
 
 ## What this demonstrates
 
