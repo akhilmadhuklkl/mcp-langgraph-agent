@@ -59,3 +59,15 @@ class RunStore:
                 "SELECT state_json FROM agent_runs WHERE run_id = ?", (run_id,)
             ).fetchone()
         return json.loads(row[0]) if row else None
+
+    def recent(self, limit: int = 10) -> list[dict[str, Any]]:
+        with self._connection() as connection:
+            rows = connection.execute(
+                "SELECT run_id, request, state_json, created_at, updated_at "
+                "FROM agent_runs ORDER BY updated_at DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return [
+            {"run_id": row[0], "request": row[1], "state": json.loads(row[2]),
+             "created_at": row[3], "updated_at": row[4]}
+            for row in rows
+        ]

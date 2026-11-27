@@ -1,39 +1,76 @@
 import argparse
 import asyncio
 
-from .graph import build_graph
-from .catalog import format_catalog
+from .cli_helpers import format_history
+from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
 from .persistence import RunStore
 from .state import initial_state
 from .trace import format_trace
 
 
-async def run(request: str, planner_mode: str = "deterministic") -> None:
+DB_PATH = "data/agent_runs.db"
+
+
+async def connect_registry() -> MCPToolRegistry:
     registry = MCPToolRegistry()
+    await registry.connect(["github", "gmail", "notion"])
+    return registry
+
+
+async def run_request(request: str, planner_mode: str) -> None:
     store = RunStore()
     state = initial_state(request, planner_mode)
     run_id = store.create(request, state)
     state["run_id"] = run_id
     store.save(run_id, state)
-    await registry.connect(["github", "gmail", "notion"])
+    registry = await connect_registry()
     try:
-        print(format_catalog(registry.catalog()))
         result = await build_graph(registry).ainvoke(state)
         store.save(run_id, result)
         print(f"Run ID: {run_id}")
-        print("\n" + format_trace(result.get("trace", [])))
+        print(format_trace(result.get("trace", [])))
+        print("\n" + result["answer"])
+    finally:
+        await registry.close()
+
+
+async def resume_request(run_id: str, approved: bool) -> None:
+    store = RunStore()
+    state = store.get(run_id)
+    if state is None:
+        raise SystemExit(f"Run not found: {run_id}")
+    registry = await connect_registry()
+    try:
+        result = await resume_workflow(registry, state, approved)
+        store.save(run_id, result)
+        print(format_trace(result.get("trace", [])))
         print("\n" + result["answer"])
     finally:
         await registry.close()
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("request")
-    parser.add_argument("--model", action="store_true", help="Use the LLM planner; requires OPENAI_API_KEY and the model extra")
+    parser = argparse.ArgumentParser(description="MCP LangGraph agent")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    run_parser = subparsers.add_parser("run", help="start a new agent run")
+    run_parser.add_argument("request")
+    run_parser.add_argument("--model", action="store_true")
+    history_parser = subparsers.add_parser("history", help="list recent runs")
+    history_parser.add_argument("--limit", type=int, default=10)
+    resume_parser = subparsers.add_parser("resume", help="resume a pending run")
+    resume_parser.add_argument("run_id")
+    decision = resume_parser.add_mutually_exclusive_group(required=True)
+    decision.add_argument("--approve", action="store_true")
+    decision.add_argument("--reject", action="store_true")
     args = parser.parse_args()
-    asyncio.run(run(args.request, "llm" if args.model else "deterministic"))
+    store = RunStore(DB_PATH)
+    if args.command == "history":
+        print(format_history(store.recent(args.limit)))
+    elif args.command == "run":
+        asyncio.run(run_request(args.request, "llm" if args.model else "deterministic"))
+    else:
+        asyncio.run(resume_request(args.run_id, args.approve))
 
 
 if __name__ == "__main__":

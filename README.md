@@ -39,7 +39,20 @@ pip install -e ".[dev]"
 Run the deterministic demo:
 
 ```powershell
-python -m mcp_agent.cli "Check GitHub issues and my Gmail inbox"
+python -m mcp_agent.cli run "Check GitHub issues and my Gmail inbox"
+```
+
+List recent runs:
+
+```powershell
+python -m mcp_agent.cli history
+```
+
+Resume a pending run after a human decision:
+
+```powershell
+python -m mcp_agent.cli resume RUN_ID --approve
+python -m mcp_agent.cli resume RUN_ID --reject
 ```
 
 Use the model-backed planner when the optional dependency and `OPENAI_API_KEY`
