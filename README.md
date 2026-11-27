@@ -9,6 +9,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Dynamic `list_tools()` discovery and namespaced tool routing
 - Human-readable tool catalog with descriptions and input schemas
 - Execution traces with tool arguments, status, results, and timing
+- Explicit workflow state for plans, results, errors, and approvals
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
