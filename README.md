@@ -204,10 +204,16 @@ The discovered tools use the same `server.tool` namespace and follow the same
 validation, retry, timeout, tracing, approval, and metrics behavior as stdio
 servers.
 
-## Suggested extensions
+## Completed engineering extensions
 
-1. Add approval before mutating tools such as `create_task`.
-2. Add a fourth server using Streamable HTTP.
-3. Persist graph checkpoints in SQLite.
-4. Add tool-level latency and failure metrics.
-5. Add contract tests against real external MCP servers.
+- Approval before mutating tools, with resumable decisions.
+- SQLite persistence for graph runs and history.
+- Tool-level latency, retry, and failure metrics.
+- Read-only contract checks against real external MCP servers.
+- Optional Streamable HTTP MCP transport.
+
+## Possible future extensions
+
+- Add a fourth production MCP server through the Streamable HTTP transport.
+- Add dashboard export for the collected tool metrics.
+- Add scheduled or event-triggered agent runs.
