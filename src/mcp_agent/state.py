@@ -25,3 +25,12 @@ def initial_state(request: str, planner_mode: str = "deterministic") -> AgentSta
         "approval_status": "not_required",
         "answer": "",
     }
+
+
+def apply_approval_decision(state: AgentState, approved: bool) -> AgentState:
+    """Return a resumable state after a human approval decision."""
+    updated = dict(state)
+    updated["approval_status"] = "approved" if approved else "rejected"
+    if not approved:
+        updated["answer"] = "The pending action was rejected and was not executed."
+    return updated

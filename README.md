@@ -59,6 +59,12 @@ Mutating tools are policy-protected. The graph pauses with
 `approval_status="pending"` before executing tools such as
 `gmail.draft_email` or `notion.create_page`.
 
+Pending state can be resumed by applying an approval decision. An approved
+state continues at the paused step; a rejected state ends safely without
+calling the mutating tool.
+
+The programmatic entry point is `resume_workflow(registry, state, approved)`.
+
 Run tests:
 
 ```powershell

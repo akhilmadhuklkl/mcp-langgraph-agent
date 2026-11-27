@@ -8,10 +8,13 @@ from .execution import resolve_arguments
 from .policy import approval_message, requires_approval
 from .planner import deterministic_plan, llm_plan
 from .state import AgentState
+from .state import apply_approval_decision
 
 
 def build_graph(registry: MCPToolRegistry):
     async def plan_node(state: AgentState) -> AgentState:
+        if state.get("plan"):
+            return {}
         if state.get("planner_mode") == "llm":
             plan = await llm_plan(state["request"], registry.catalog())
         else:
@@ -68,11 +71,15 @@ def build_graph(registry: MCPToolRegistry):
         }
 
     def should_continue(state: AgentState) -> str:
+        if state.get("approval_status") == "rejected":
+            return "finish"
         if state.get("approval_status") == "pending":
             return "approval"
         return "execute" if state["current_step"] < len(state["plan"]) else "finish"
 
     def finish_node(state: AgentState) -> AgentState:
+        if state.get("approval_status") == "rejected":
+            return {"answer": state.get("answer", "The action was rejected.")}
         lines = [f"{item['tool']}: {item['result']}" for item in state["results"]]
         prefix = "Completed the requested workflow."
         if state.get("errors"):
@@ -88,3 +95,8 @@ def build_graph(registry: MCPToolRegistry):
     workflow.add_conditional_edges("execute", should_continue, {"execute": "execute", "finish": "finish", "approval": END})
     workflow.add_edge("finish", END)
     return workflow.compile()
+
+
+async def resume_workflow(registry: MCPToolRegistry, state: AgentState, approved: bool) -> AgentState:
+    """Resume a pending graph run after a human decision."""
+    return await build_graph(registry).ainvoke(apply_approval_decision(state, approved))
