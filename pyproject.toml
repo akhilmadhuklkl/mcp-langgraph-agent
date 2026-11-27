@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
   "setuptools>=84.1",
-  "mcp>=1.29.0,<2.0",
+  "mcp>=1.29.0,<3.0",
   "langgraph>=0.6.0",
   "langchain-core>=0.3.0",
 ]
