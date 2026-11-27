@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$callbackPort = 33222
 $clientPath = $env:GOOGLE_OAUTH_CLIENT_JSON
 if (-not $clientPath) {
     throw "Set GOOGLE_OAUTH_CLIENT_JSON to the downloaded Google OAuth client JSON path."
@@ -19,5 +20,12 @@ if (-not $oauth.client_id -or -not $oauth.client_secret) {
 }
 
 $oauthInfo = @{ client_id = $oauth.client_id; client_secret = $oauth.client_secret } | ConvertTo-Json -Compress
-& npx -y mcp-remote $ServerUrl --static-oauth-client-info $oauthInfo
-exit $LASTEXITCODE
+$tempOAuthPath = Join-Path ([System.IO.Path]::GetTempPath()) ("mcp-oauth-" + [guid]::NewGuid().ToString() + ".json")
+try {
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($tempOAuthPath, $oauthInfo, $utf8NoBom)
+    & npx -y mcp-remote $ServerUrl $callbackPort ("--static-oauth-client-info") ("@" + $tempOAuthPath)
+    exit $LASTEXITCODE
+} finally {
+    Remove-Item -LiteralPath $tempOAuthPath -Force -ErrorAction SilentlyContinue
+}
