@@ -110,7 +110,7 @@ def print_plan(request: str, json_output: bool = False) -> None:
         print(f"  {index}. {step['tool']} | arguments={step['arguments']}")
 
 
-async def resume_request(run_id: str, approved: bool) -> None:
+async def resume_request(run_id: str, approved: bool, json_output: bool = False) -> None:
     store = RunStore()
     state = store.get(run_id)
     if state is None:
@@ -119,6 +119,19 @@ async def resume_request(run_id: str, approved: bool) -> None:
     try:
         result = await resume_workflow(registry, state, approved)
         store.save(run_id, result)
+        if json_output:
+            print(
+                json.dumps(
+                    {
+                        "run_id": run_id,
+                        "answer": result["answer"],
+                        "trace": result.get("trace", []),
+                        "metrics": registry.metrics(),
+                    },
+                    indent=2,
+                )
+            )
+            return
         print(format_trace(result.get("trace", [])))
         print_metrics(registry.metrics())
         print("\n" + result["answer"])
@@ -141,6 +154,7 @@ def main() -> None:
     decision = resume_parser.add_mutually_exclusive_group(required=True)
     decision.add_argument("--approve", action="store_true")
     decision.add_argument("--reject", action="store_true")
+    resume_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     doctor_parser = subparsers.add_parser("doctor", help="check MCP integration readiness")
     doctor_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     catalog_parser = subparsers.add_parser("catalog", help="discover configured MCP tools")
@@ -166,7 +180,7 @@ def main() -> None:
     elif args.command == "run":
         asyncio.run(run_request(args.request, "llm" if args.model else "deterministic", args.json))
     else:
-        asyncio.run(resume_request(args.run_id, args.approve))
+        asyncio.run(resume_request(args.run_id, args.approve, args.json))
 
 
 if __name__ == "__main__":

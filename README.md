@@ -190,6 +190,12 @@ Run a workflow and receive its answer, trace, metrics, and run ID as JSON with:
 python -m mcp_agent.cli run "Search Gmail for MCP" --json
 ```
 
+Resume an approved or rejected pending run as JSON with:
+
+```powershell
+python -m mcp_agent.cli resume <run-id> --approve --json
+```
+
 Run tests:
 
 ```powershell
