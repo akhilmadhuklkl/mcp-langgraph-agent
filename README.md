@@ -61,6 +61,12 @@ Discover the exact tools exposed by the configured MCP servers:
 python -m mcp_agent.cli catalog
 ```
 
+Preview a deterministic plan without connecting to any server:
+
+```powershell
+python -m mcp_agent.cli plan "Search Gmail for MCP and find matching Drive files"
+```
+
 Gmail and Google Drive follow the same pattern as GitHub. Set
 `GMAIL_MCP_COMMAND` or `GOOGLE_DRIVE_MCP_COMMAND` and optionally the matching
 `*_ARGS` variable to connect external servers. If unset, local mock servers are

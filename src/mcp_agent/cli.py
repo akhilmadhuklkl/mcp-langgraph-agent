@@ -7,6 +7,7 @@ from .doctor import format_checks, readiness_checks
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
 from .persistence import RunStore
+from .planner import deterministic_plan
 from .state import initial_state
 from .trace import format_trace
 
@@ -61,6 +62,12 @@ async def catalog_request() -> None:
         await registry.close()
 
 
+def print_plan(request: str) -> None:
+    print("Planned MCP steps:")
+    for index, step in enumerate(deterministic_plan(request), start=1):
+        print(f"  {index}. {step['tool']} | arguments={step['arguments']}")
+
+
 async def resume_request(run_id: str, approved: bool) -> None:
     store = RunStore()
     state = store.get(run_id)
@@ -91,12 +98,16 @@ def main() -> None:
     decision.add_argument("--reject", action="store_true")
     subparsers.add_parser("doctor", help="check MCP integration readiness")
     subparsers.add_parser("catalog", help="discover configured MCP tools")
+    plan_parser = subparsers.add_parser("plan", help="show a plan without executing it")
+    plan_parser.add_argument("request")
     args = parser.parse_args()
     store = RunStore(DB_PATH)
     if args.command == "doctor":
         print(format_checks(readiness_checks()))
     elif args.command == "catalog":
         asyncio.run(catalog_request())
+    elif args.command == "plan":
+        print_plan(args.request)
     elif args.command == "history":
         print(format_history(store.recent(args.limit)))
     elif args.command == "run":
