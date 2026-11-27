@@ -87,9 +87,13 @@ def print_metrics(metrics: list[dict[str, object]]) -> None:
         )
 
 
-def print_plan(request: str) -> None:
+def print_plan(request: str, json_output: bool = False) -> None:
+    plan = deterministic_plan(request)
+    if json_output:
+        print(json.dumps(plan, indent=2))
+        return
     print("Planned MCP steps:")
-    for index, step in enumerate(deterministic_plan(request), start=1):
+    for index, step in enumerate(plan, start=1):
         print(f"  {index}. {step['tool']} | arguments={step['arguments']}")
 
 
@@ -128,6 +132,7 @@ def main() -> None:
     catalog_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     plan_parser = subparsers.add_parser("plan", help="show a plan without executing it")
     plan_parser.add_argument("request")
+    plan_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     args = parser.parse_args()
     store = RunStore(DB_PATH)
     if args.command == "doctor":
@@ -135,7 +140,7 @@ def main() -> None:
     elif args.command == "catalog":
         asyncio.run(catalog_request(args.json))
     elif args.command == "plan":
-        print_plan(args.request)
+        print_plan(args.request, args.json)
     elif args.command == "history":
         print(format_history(store.recent(args.limit)))
     elif args.command == "run":

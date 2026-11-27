@@ -172,6 +172,12 @@ For integrations that need machine-readable discovery data, use:
 python -m mcp_agent.cli catalog --json
 ```
 
+Preview a deterministic plan as JSON with:
+
+```powershell
+python -m mcp_agent.cli plan "Search Gmail for MCP" --json
+```
+
 Run tests:
 
 ```powershell
