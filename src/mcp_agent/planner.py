@@ -25,8 +25,8 @@ def deterministic_plan(request: str) -> list[dict[str, Any]]:
 async def llm_plan(request: str, tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Generate a validated tool plan using an optional LangChain model."""
     try:
-        from pydantic import BaseModel, Field
         from langchain_openai import ChatOpenAI
+        from pydantic import BaseModel, Field
     except ImportError as exc:
         raise RuntimeError("Install the model extra with: pip install -e '.[model]'") from exc
 

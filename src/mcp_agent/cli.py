@@ -2,7 +2,7 @@ import argparse
 import asyncio
 
 from .cli_helpers import format_history
-from .config import drive_server_config, gmail_server_config, github_server_config
+from .config import drive_server_config, github_server_config, gmail_server_config
 from .doctor import format_checks, readiness_checks
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
@@ -10,7 +10,6 @@ from .persistence import RunStore
 from .planner import deterministic_plan
 from .state import initial_state
 from .trace import format_trace
-
 
 DB_PATH = "data/agent_runs.db"
 

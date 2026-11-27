@@ -1,5 +1,4 @@
 import asyncio
-import os
 
 from mcp_agent.config import gmail_server_config
 from mcp_agent.mcp_client import MCPToolRegistry

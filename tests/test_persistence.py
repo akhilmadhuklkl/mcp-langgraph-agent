@@ -1,6 +1,7 @@
-from mcp_agent.persistence import RunStore
 from pathlib import Path
 from uuid import uuid4
+
+from mcp_agent.persistence import RunStore
 
 
 def test_run_store_round_trip():

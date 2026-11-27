@@ -1,15 +1,15 @@
+import asyncio
+import sys
 from contextlib import AsyncExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-import sys
-import asyncio
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-from .reliability import retry_count, retry_delay
 from .config import ExternalServerConfig
+from .reliability import retry_count, retry_delay
 
 
 @dataclass
@@ -89,7 +89,7 @@ class MCPToolRegistry:
                     timeout=self.timeout_seconds,
                 )
                 break
-            except Exception as exc:  # noqa: BLE001 - retry then surface the final error
+            except Exception as exc:
                 last_error = exc
                 if attempt > self.max_retries:
                     raise RuntimeError(

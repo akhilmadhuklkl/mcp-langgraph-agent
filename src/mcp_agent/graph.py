@@ -1,14 +1,13 @@
-from typing import Any
 from time import perf_counter
+from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
-from .mcp_client import MCPToolRegistry
 from .execution import resolve_arguments
-from .policy import approval_message, requires_approval
+from .mcp_client import MCPToolRegistry
 from .planner import deterministic_plan, llm_plan
-from .state import AgentState
-from .state import apply_approval_decision
+from .policy import approval_message, requires_approval
+from .state import AgentState, apply_approval_decision
 
 
 def build_graph(registry: MCPToolRegistry):
@@ -66,7 +65,7 @@ def build_graph(registry: MCPToolRegistry):
             "trace": [*state.get("trace", []), trace_item],
             "errors": [
                 *state.get("errors", []),
-                *([{"tool": step["tool"], "message": str(exc)}] if trace_item["status"] == "error" else []),
+                *([{"tool": step["tool"], "message": trace_item["error"]}] if trace_item["status"] == "error" else []),
             ],
         }
 

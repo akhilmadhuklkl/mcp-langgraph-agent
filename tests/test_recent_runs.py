@@ -1,6 +1,7 @@
-from mcp_agent.persistence import RunStore
 from pathlib import Path
 from uuid import uuid4
+
+from mcp_agent.persistence import RunStore
 
 
 def test_recent_runs_returns_saved_runs():

@@ -1,6 +1,5 @@
 from typing import Any
 
-
 MUTATING_TOOLS = {
     "github.create_issue",
     "github.create_pull_request",

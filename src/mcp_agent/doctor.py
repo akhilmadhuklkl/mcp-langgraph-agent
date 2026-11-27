@@ -2,7 +2,7 @@ import os
 import shutil
 from dataclasses import dataclass
 
-from .config import drive_server_config, gmail_server_config, github_server_config
+from .config import drive_server_config, github_server_config, gmail_server_config
 
 
 @dataclass(frozen=True)
