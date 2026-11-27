@@ -3,6 +3,7 @@ from typing import Any, TypedDict
 
 class AgentState(TypedDict, total=False):
     request: str
+    run_id: str
     planner_mode: str
     plan: list[dict[str, Any]]
     current_step: int

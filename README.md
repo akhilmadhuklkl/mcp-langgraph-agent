@@ -14,6 +14,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Result-aware execution where later tools can consume earlier results
 - Approval gates before mutating GitHub, Gmail, or Notion tools
 - Bounded MCP retries, exponential backoff, and per-call timeouts
+- SQLite persistence for run state and resumable workflows
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -68,6 +69,9 @@ The programmatic entry point is `resume_workflow(registry, state, approved)`.
 
 MCP calls default to a 30-second timeout and two retries. These values can be
 configured through `MCPToolRegistry(timeout_seconds=..., max_retries=...)`.
+
+CLI runs are persisted in `data/agent_runs.db` (ignored by Git). Each run prints
+a UUID that can be used by future resume and run-history commands.
 
 Run tests:
 
