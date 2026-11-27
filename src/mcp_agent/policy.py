@@ -4,6 +4,9 @@ from typing import Any
 MUTATING_TOOLS = {
     "github.create_issue",
     "github.create_pull_request",
+    "gmail.create_draft",
+    "gmail.send_message",
+    # Backward-compatible names used by the local mock server.
     "gmail.draft_email",
     "gmail.send_email",
     "drive.create_file",

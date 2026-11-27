@@ -3,7 +3,8 @@ from mcp_agent.policy import approval_message, requires_approval
 
 def test_mutating_tools_require_approval():
     assert requires_approval("drive.create_file")
-    assert requires_approval("gmail.draft_email")
+    assert requires_approval("gmail.create_draft")
+    assert requires_approval("gmail.send_message")
     assert not requires_approval("github.search_issues")
 
 
