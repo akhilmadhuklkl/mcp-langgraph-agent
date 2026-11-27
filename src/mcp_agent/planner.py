@@ -7,7 +7,9 @@ def deterministic_plan(request: str) -> list[dict[str, Any]]:
     if "github" in text or "issue" in text or "pull request" in text:
         plan.append({"tool": "github.search_issues", "arguments": {"query": "open"}})
     if "drive" in text or "google drive" in text or "document" in text or "documentation" in text:
-        query = "${last_result}" if plan else "MCP"
+        # Drive search_files expects a Google Drive query expression, not a
+        # free-form keyword. Keep the deterministic default read-only.
+        query = "name contains 'MCP'"
         plan.append({"tool": "drive.search_files", "arguments": {"query": query}})
     if "email" in text or "gmail" in text or "inbox" in text:
         query = "${last_result}" if plan else "MCP"
