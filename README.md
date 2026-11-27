@@ -15,6 +15,7 @@ and routes multi-step tasks through a LangGraph workflow.
 - Approval gates before mutating GitHub, Gmail, or Notion tools
 - Bounded MCP retries, exponential backoff, and per-call timeouts
 - SQLite persistence for run state and resumable workflows
+- Optional connection to the official GitHub MCP server over stdio
 - LangGraph state-machine orchestration
 - Multi-step plans such as: "Check GitHub issues and summarize related Notion notes"
 - Deterministic demo mode that does not require an API key
@@ -85,6 +86,11 @@ configured through `MCPToolRegistry(timeout_seconds=..., max_retries=...)`.
 
 CLI runs are persisted in `data/agent_runs.db` (ignored by Git). Each run prints
 a UUID that can be used by future resume and run-history commands.
+
+To use the official GitHub MCP server, install `github-mcp-server`, copy
+`.env.example` to `.env`, and provide `GITHUB_PERSONAL_ACCESS_TOKEN` through
+your shell or environment manager. Set `GITHUB_MCP_COMMAND` to the executable
+name or full path. If it is unset, the local mock GitHub server is used.
 
 Run tests:
 

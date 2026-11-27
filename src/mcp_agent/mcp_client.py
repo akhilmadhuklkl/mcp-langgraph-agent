@@ -9,6 +9,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from .reliability import retry_count, retry_delay
+from .config import ExternalServerConfig
 
 
 @dataclass
@@ -44,19 +45,26 @@ class MCPToolRegistry:
                 command=sys.executable,
                 args=[str(root / "server_runner.py"), name],
             )
-            read, write = await self.stack.enter_async_context(stdio_client(params))
-            session = await self.stack.enter_async_context(ClientSession(read, write))
-            await session.initialize()
-            self.sessions[name] = session
-            result = await session.list_tools()
-            for tool in result.tools:
-                key = f"{name}.{tool.name}"
-                self.tools[key] = ToolHandle(
-                    server=name,
-                    name=tool.name,
-                    description=tool.description or "",
-                    schema=tool.inputSchema,
-                )
+            await self._connect_with_params(name, params)
+
+    async def connect_external(self, name: str, config: ExternalServerConfig) -> None:
+        params = StdioServerParameters(command=config.command, args=config.args, env=config.env)
+        await self._connect_with_params(name, params)
+
+    async def _connect_with_params(self, name: str, params: StdioServerParameters) -> None:
+        read, write = await self.stack.enter_async_context(stdio_client(params))
+        session = await self.stack.enter_async_context(ClientSession(read, write))
+        await session.initialize()
+        self.sessions[name] = session
+        result = await session.list_tools()
+        for tool in result.tools:
+            key = f"{name}.{tool.name}"
+            self.tools[key] = ToolHandle(
+                server=name,
+                name=tool.name,
+                description=tool.description or "",
+                schema=tool.inputSchema,
+            )
 
     def catalog(self) -> list[dict[str, Any]]:
         """Return stable, presentation-friendly metadata for discovered tools."""

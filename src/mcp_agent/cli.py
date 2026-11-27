@@ -2,6 +2,7 @@ import argparse
 import asyncio
 
 from .cli_helpers import format_history
+from .config import github_server_config
 from .graph import build_graph, resume_workflow
 from .mcp_client import MCPToolRegistry
 from .persistence import RunStore
@@ -14,7 +15,12 @@ DB_PATH = "data/agent_runs.db"
 
 async def connect_registry() -> MCPToolRegistry:
     registry = MCPToolRegistry()
-    await registry.connect(["github", "gmail", "notion"])
+    github_config = github_server_config()
+    if github_config:
+        await registry.connect_external("github", github_config)
+        await registry.connect(["gmail", "notion"])
+    else:
+        await registry.connect(["github", "gmail", "notion"])
     return registry
 
 
