@@ -3,6 +3,7 @@ import asyncio
 import csv
 import json
 import sys
+from html import escape
 
 from . import __version__
 from .cli_helpers import format_history
@@ -125,6 +126,24 @@ def aggregate_run_metrics(runs: list[dict[str, object]]) -> list[dict[str, objec
     ]
 
 
+def render_metrics_html(metrics: list[dict[str, object]]) -> str:
+    rows = "\n".join(
+        "<tr>"
+        + "".join(f"<td>{escape(str(item[field]))}</td>" for field in metrics[0])
+        + "</tr>"
+        for item in metrics
+    )
+    headers = "".join(f"<th>{escape(str(field))}</th>" for field in (metrics[0] if metrics else []))
+    return (
+        "<!doctype html><html><head><meta charset='utf-8'>"
+        "<title>MCP Agent Metrics</title><style>body{font-family:system-ui;margin:2rem}"
+        "table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:.5rem}"
+        "th{background:#eee}</style></head><body><h1>MCP Agent Metrics</h1>"
+        f"<table><thead><tr>{headers}</tr></thead><tbody>{rows}</tbody></table>"
+        "</body></html>"
+    )
+
+
 def print_plan(request: str, json_output: bool = False) -> None:
     plan = deterministic_plan(request)
     if json_output:
@@ -179,6 +198,7 @@ def main() -> None:
     metrics_parser.add_argument("--limit", type=int, default=100)
     metrics_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     metrics_parser.add_argument("--csv", action="store_true", help="emit CSV for spreadsheet tools")
+    metrics_parser.add_argument("--html", action="store_true", help="emit a standalone HTML report")
     resume_parser = subparsers.add_parser("resume", help="resume a pending run")
     resume_parser.add_argument("run_id")
     decision = resume_parser.add_mutually_exclusive_group(required=True)
@@ -210,7 +230,9 @@ def main() -> None:
         print(json.dumps(runs, indent=2, default=str) if args.json else format_history(runs))
     elif args.command == "metrics":
         metrics = aggregate_run_metrics(store.recent(args.limit))
-        if args.csv:
+        if args.html:
+            print(render_metrics_html(metrics))
+        elif args.csv:
             writer = csv.DictWriter(sys.stdout, fieldnames=["tool", "calls", "successes", "failures", "average_duration_ms"])
             writer.writeheader()
             writer.writerows(metrics)

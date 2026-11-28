@@ -214,6 +214,12 @@ Export the same report for spreadsheets with:
 python -m mcp_agent.cli metrics --csv
 ```
 
+Create a standalone browser report with:
+
+```powershell
+python -m mcp_agent.cli metrics --html > metrics.html
+```
+
 Run tests:
 
 ```powershell
