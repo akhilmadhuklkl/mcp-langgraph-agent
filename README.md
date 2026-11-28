@@ -123,6 +123,8 @@ Or use the helper:
 .\scripts\run-local-model.ps1 -Request "Search Gmail for MCP"
 ```
 
+Add `-Json` for machine-readable output.
+
 The LLM receives the discovered MCP tool catalog and must return exact
 namespaced tool names plus JSON arguments. Deterministic planning remains the
 default for local development and tests.
