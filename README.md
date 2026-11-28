@@ -230,6 +230,8 @@ JSON result with:
   -OutputDirectory "data\scheduled-runs"
 ```
 
+Add `-Model` when `OPENAI_API_KEY` is configured to use model-backed planning.
+
 Run tests:
 
 ```powershell
