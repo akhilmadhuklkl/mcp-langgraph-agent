@@ -1,6 +1,8 @@
 import argparse
 import asyncio
+import csv
 import json
+import sys
 
 from . import __version__
 from .cli_helpers import format_history
@@ -176,6 +178,7 @@ def main() -> None:
     metrics_parser = subparsers.add_parser("metrics", help="summarize persisted tool metrics")
     metrics_parser.add_argument("--limit", type=int, default=100)
     metrics_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    metrics_parser.add_argument("--csv", action="store_true", help="emit CSV for spreadsheet tools")
     resume_parser = subparsers.add_parser("resume", help="resume a pending run")
     resume_parser.add_argument("run_id")
     decision = resume_parser.add_mutually_exclusive_group(required=True)
@@ -207,7 +210,11 @@ def main() -> None:
         print(json.dumps(runs, indent=2, default=str) if args.json else format_history(runs))
     elif args.command == "metrics":
         metrics = aggregate_run_metrics(store.recent(args.limit))
-        if args.json:
+        if args.csv:
+            writer = csv.DictWriter(sys.stdout, fieldnames=["tool", "calls", "successes", "failures", "average_duration_ms"])
+            writer.writeheader()
+            writer.writerows(metrics)
+        elif args.json:
             print(json.dumps(metrics, indent=2))
         else:
             print_metrics(metrics)

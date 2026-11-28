@@ -208,6 +208,12 @@ Aggregate metrics across persisted runs with:
 python -m mcp_agent.cli metrics --json
 ```
 
+Export the same report for spreadsheets with:
+
+```powershell
+python -m mcp_agent.cli metrics --csv
+```
+
 Run tests:
 
 ```powershell
