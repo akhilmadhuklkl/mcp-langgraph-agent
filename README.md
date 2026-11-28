@@ -100,11 +100,20 @@ python -m mcp_agent.cli resume RUN_ID --approve
 python -m mcp_agent.cli resume RUN_ID --reject
 ```
 
-Use the model-backed planner when the optional dependency and `OPENAI_API_KEY`
-are configured:
+Use the model-backed planner when the optional dependency is installed. By
+default it uses OpenAI, but setting `OLLAMA_MODEL` routes planning to a local
+Ollama model and requires no OpenAI API key:
 
 ```powershell
 pip install -e ".[model]"
+python -m mcp_agent.cli run "Find GitHub issues and related Drive documents" --model
+```
+
+For local Ollama planning:
+
+```powershell
+$env:OLLAMA_MODEL = "llama3.2:3b"
+$env:OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1"
 python -m mcp_agent.cli run "Find GitHub issues and related Drive documents" --model
 ```
 

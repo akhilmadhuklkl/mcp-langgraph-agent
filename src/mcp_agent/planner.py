@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 
@@ -48,6 +49,15 @@ async def llm_plan(request: str, tools: list[dict[str, Any]]) -> list[dict[str, 
         "messages or mutate data unless the user explicitly requests it.\n\n"
         f"Available tools:\n{tool_text}\n\nUser request: {request}"
     )
-    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    ollama_model = os.getenv("OLLAMA_MODEL")
+    if ollama_model:
+        model = ChatOpenAI(
+            model=ollama_model,
+            temperature=0,
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
+            api_key="ollama",
+        )
+    else:
+        model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     result = await model.with_structured_output(Plan).ainvoke(prompt)
     return [step.model_dump() for step in result.steps]
