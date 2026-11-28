@@ -16,5 +16,8 @@ RUN useradd --create-home --uid 10001 appuser \
 
 USER appuser
 
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD python -c "import mcp_agent"
+
 ENTRYPOINT ["python", "-m", "mcp_agent.cli"]
 CMD ["doctor"]
