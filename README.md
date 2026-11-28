@@ -37,6 +37,7 @@ See [docs/deployment.md](docs/deployment.md) for Docker and production guidance.
 - `github`: search issues and inspect pull requests
 - `gmail`: search email and create drafts without sending
 - `drive`: search project files and create documents
+- `spotify`: search the Spotify catalog and inspect the authenticated user's profile/playlists
 
 ## Setup
 

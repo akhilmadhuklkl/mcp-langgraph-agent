@@ -9,6 +9,8 @@ MUTATING_TOOLS = {
     "gmail.draft_email",
     "gmail.send_email",
     "drive.create_file",
+    "spotify.create_playlist",
+    "spotify.add_items_to_playlist",
 }
 
 
