@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import csv
 import json
+import os
 import sys
 from html import escape
 
@@ -21,7 +22,7 @@ from .planner import deterministic_plan
 from .state import initial_state
 from .trace import format_trace
 
-DB_PATH = "data/agent_runs.db"
+DB_PATH = os.getenv("MCP_AGENT_DB_PATH", "data/agent_runs.db")
 
 
 async def connect_registry() -> MCPToolRegistry:

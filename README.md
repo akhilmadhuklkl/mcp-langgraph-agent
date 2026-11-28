@@ -271,6 +271,10 @@ The discovered tools use the same `server.tool` namespace and follow the same
 validation, retry, timeout, tracing, approval, and metrics behavior as stdio
 servers.
 
+Run history defaults to `data/agent_runs.db`. Override it with the
+`MCP_AGENT_DB_PATH` environment variable when separating demo or deployment
+data.
+
 To make an HTTP server available automatically to the CLI, set
 `MCP_HTTP_SERVER_NAME` and `MCP_HTTP_SERVER_URL` in the environment.
 
