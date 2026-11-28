@@ -10,6 +10,7 @@ See the [security policy](SECURITY.md) for credential-handling and reporting gui
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull-request guidelines.
 See [CHANGELOG.md](CHANGELOG.md) for the project history.
 This project is available under the [MIT License](LICENSE).
+See [docs/deployment.md](docs/deployment.md) for Docker and production guidance.
 
 ## What this demonstrates
 
