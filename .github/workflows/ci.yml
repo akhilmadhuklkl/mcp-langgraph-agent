@@ -44,6 +44,9 @@ jobs:
       - name: Run tests
         run: python -m pytest -q --cov=src/mcp_agent --cov-report=term-missing --cov-fail-under=50
 
+      - name: Evaluate deterministic planner
+        run: python scripts/evaluate_planners.py
+
   container:
     needs: test
     runs-on: ubuntu-latest
