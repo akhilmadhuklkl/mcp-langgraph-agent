@@ -232,6 +232,12 @@ For model-backed planning, set `OPENAI_API_KEY` and run:
 python -m mcp_agent.cli "What should I do before my next meeting?" --model
 ```
 
+To demonstrate the complete local workflow without external credentials, run:
+
+```powershell
+.\scripts\demo-local.ps1
+```
+
 ## Architecture
 
 ```text
