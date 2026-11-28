@@ -45,6 +45,17 @@ kept as an optional bridge and requires Spotify Developer access and OAuth.
 
 ## Setup
 
+### Authenticated HTTP service
+
+Set `MCP_AGENT_API_KEY`, then run:
+
+```powershell
+python -m mcp_agent.api
+```
+
+`GET /health` is public. `POST /plan` and `GET /catalog` require either
+`Authorization: Bearer <key>` or `X-API-Key: <key>`.
+
 ```powershell
 cd mcp-langgraph-agent
 python -m venv .venv
