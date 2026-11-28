@@ -12,6 +12,7 @@ from .config import (
     drive_server_config,
     github_server_config,
     gmail_server_config,
+    spotify_server_config,
     streamable_http_server_config,
 )
 from .doctor import format_checks, readiness_checks
@@ -42,6 +43,11 @@ async def connect_registry() -> MCPToolRegistry:
         await registry.connect_external("drive", drive_config)
     else:
         await registry.connect(["drive"])
+    spotify_config = spotify_server_config()
+    if spotify_config:
+        await registry.connect_external("spotify", spotify_config)
+    else:
+        await registry.connect(["spotify"])
     http_config = streamable_http_server_config()
     if http_config:
         await registry.connect_streamable_http(http_config.name, http_config.url)

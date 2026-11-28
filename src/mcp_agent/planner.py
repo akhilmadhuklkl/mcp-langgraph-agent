@@ -26,6 +26,8 @@ def deterministic_plan(request: str) -> list[dict[str, Any]]:
         # Gmail uses Gmail search syntax; do not pass serialized output from a
         # previous server as a query.
         plan.append({"tool": "gmail.search_threads", "arguments": {"query": "MCP"}})
+    if "spotify" in text or "playlist" in text or "music" in text or "song" in text:
+        plan.append({"tool": "spotify.search", "arguments": {"query": "favorite"}})
     if not plan:
         plan.append({"tool": "github.search_issues", "arguments": {"query": "open"}})
     return plan
