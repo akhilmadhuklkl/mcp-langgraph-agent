@@ -117,6 +117,12 @@ $env:OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1"
 python -m mcp_agent.cli run "Find GitHub issues and related Drive documents" --model
 ```
 
+Or use the helper:
+
+```powershell
+.\scripts\run-local-model.ps1 -Request "Search Gmail for MCP"
+```
+
 The LLM receives the discovered MCP tool catalog and must return exact
 namespaced tool names plus JSON arguments. Deterministic planning remains the
 default for local development and tests.
