@@ -100,6 +100,29 @@ def print_metrics(metrics: list[dict[str, object]]) -> None:
         )
 
 
+def aggregate_run_metrics(runs: list[dict[str, object]]) -> list[dict[str, object]]:
+    aggregate: dict[str, dict[str, float]] = {}
+    for run in runs:
+        state = run.get("state", {})
+        for item in state.get("trace", []):
+            tool = item["tool"]
+            values = aggregate.setdefault(tool, {"calls": 0, "successes": 0, "failures": 0, "duration_ms": 0})
+            values["calls"] += 1
+            values["successes"] += item.get("status") == "success"
+            values["failures"] += item.get("status") == "error"
+            values["duration_ms"] += item.get("duration_ms", 0)
+    return [
+        {
+            "tool": tool,
+            "calls": int(values["calls"]),
+            "successes": int(values["successes"]),
+            "failures": int(values["failures"]),
+            "average_duration_ms": values["duration_ms"] / values["calls"],
+        }
+        for tool, values in sorted(aggregate.items())
+    ]
+
+
 def print_plan(request: str, json_output: bool = False) -> None:
     plan = deterministic_plan(request)
     if json_output:
@@ -150,6 +173,9 @@ def main() -> None:
     history_parser = subparsers.add_parser("history", help="list recent runs")
     history_parser.add_argument("--limit", type=int, default=10)
     history_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    metrics_parser = subparsers.add_parser("metrics", help="summarize persisted tool metrics")
+    metrics_parser.add_argument("--limit", type=int, default=100)
+    metrics_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     resume_parser = subparsers.add_parser("resume", help="resume a pending run")
     resume_parser.add_argument("run_id")
     decision = resume_parser.add_mutually_exclusive_group(required=True)
@@ -179,6 +205,12 @@ def main() -> None:
     elif args.command == "history":
         runs = store.recent(args.limit)
         print(json.dumps(runs, indent=2, default=str) if args.json else format_history(runs))
+    elif args.command == "metrics":
+        metrics = aggregate_run_metrics(store.recent(args.limit))
+        if args.json:
+            print(json.dumps(metrics, indent=2))
+        else:
+            print_metrics(metrics)
     elif args.command == "run":
         asyncio.run(run_request(args.request, "llm" if args.model else "deterministic", args.json))
     else:

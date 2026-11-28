@@ -202,6 +202,12 @@ List persisted runs as JSON with:
 python -m mcp_agent.cli history --json
 ```
 
+Aggregate metrics across persisted runs with:
+
+```powershell
+python -m mcp_agent.cli metrics --json
+```
+
 Run tests:
 
 ```powershell
