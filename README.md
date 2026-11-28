@@ -37,11 +37,6 @@ See [docs/deployment.md](docs/deployment.md) for Docker and production guidance.
 - `github`: search issues and inspect pull requests
 - `gmail`: search email and create drafts without sending
 - `drive`: search project files and create documents
-- `spotify`: search the Spotify catalog and inspect the authenticated user's profile/playlists
-
-Spotify note: the repository includes an offline Spotify mock, which is the
-default when `SPOTIFY_MCP_COMMAND` is unset. Real Spotify Web API access is
-kept as an optional bridge and requires Spotify Developer access and OAuth.
 
 ## Setup
 
@@ -197,8 +192,6 @@ are configured, use:
 python scripts/verify_live_servers.py
 ```
 
-The check includes Spotify when `SPOTIFY_MCP_COMMAND` is configured; otherwise
-it reports that Spotify is not configured.
 
 This validates that the expected tools are discoverable and accepts the same
 arguments used by the agent. It is intentionally opt-in and is not part of CI
@@ -343,6 +336,5 @@ To make an HTTP server available automatically to the CLI, set
 
 ## Possible future extensions
 
-- Add a fourth production MCP server through the Streamable HTTP transport.
 - Add dashboard export for the collected tool metrics.
 - Add scheduled or event-triggered agent runs.

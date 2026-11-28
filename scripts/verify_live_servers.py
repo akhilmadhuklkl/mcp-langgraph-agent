@@ -7,7 +7,6 @@ from mcp_agent.config import (
     drive_server_config,
     github_server_config,
     gmail_server_config,
-    spotify_server_config,
 )
 from mcp_agent.mcp_client import MCPToolRegistry
 
@@ -52,12 +51,6 @@ async def main() -> None:
             drive_server_config,
             "drive.search_files",
             {"query": "name contains 'MCP'", "pageSize": 1},
-        ),
-        verify_server(
-            "spotify",
-            spotify_server_config,
-            "spotify.search",
-            {"query": "MCP", "kind": "track", "limit": 1},
         ),
     ]
     for check in checks:

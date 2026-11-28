@@ -63,7 +63,7 @@ class AgentHandler(BaseHTTPRequestHandler):
 
 async def _registry() -> MCPToolRegistry:
     registry = MCPToolRegistry()
-    await registry.connect(["github", "gmail", "drive", "spotify"])
+    await registry.connect(["github", "gmail", "drive"])
     return registry
 
 

@@ -67,17 +67,6 @@ def drive_server() -> FastMCP:
     return server
 
 
-def spotify_server() -> FastMCP:
-    server = FastMCP("spotify")
-
-    @server.tool()
-    def search(query: str) -> list[dict[str, str]]:
-        """Search the local demo music catalog; real Spotify uses the external MCP server."""
-        return [{"name": "Demo track", "artist": "MCP Band", "query": query, "status": "mock"}]
-
-    return server
-
-
 def main(server_name: str) -> None:
-    servers = {"github": github_server, "gmail": gmail_server, "drive": drive_server, "spotify": spotify_server}
+    servers = {"github": github_server, "gmail": gmail_server, "drive": drive_server}
     servers[server_name]().run(transport="stdio")

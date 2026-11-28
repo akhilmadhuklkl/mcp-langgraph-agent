@@ -1,0 +1,40 @@
+{
+  "passed": 4,
+  "total": 4,
+  "accuracy": 1.0,
+  "cases": [
+    {
+      "request": "Search Gmail for MCP",
+      "expected": "gmail.search_threads",
+      "tools": [
+        "gmail.search_threads"
+      ],
+      "passed": true
+    },
+    {
+      "request": "Find GitHub issues",
+      "expected": "github.search_issues",
+      "tools": [
+        "github.search_issues"
+      ],
+      "passed": true
+    },
+    {
+      "request": "Find Drive documents",
+      "expected": "drive.search_files",
+      "tools": [
+        "drive.search_files"
+      ],
+      "passed": true
+    },
+    {
+      "request": "Search Gmail and find Drive documents",
+      "expected": "gmail.search_threads",
+      "tools": [
+        "drive.search_files",
+        "gmail.search_threads"
+      ],
+      "passed": true
+    }
+  ]
+}

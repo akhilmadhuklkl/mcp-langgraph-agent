@@ -7,7 +7,6 @@ from .config import (
     drive_server_config,
     github_server_config,
     gmail_server_config,
-    spotify_server_config,
     streamable_http_server_config,
 )
 
@@ -25,7 +24,6 @@ def readiness_checks() -> list[Check]:
     token = bool(os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))
     gmail_config = gmail_server_config()
     drive_config = drive_server_config()
-    spotify_config = spotify_server_config()
     oauth_json = os.getenv("GOOGLE_OAUTH_CLIENT_JSON")
     oauth_ready = bool(oauth_json and os.path.isfile(oauth_json))
     http_config = streamable_http_server_config()
@@ -37,7 +35,6 @@ def readiness_checks() -> list[Check]:
         Check("Gmail command", "ready" if gmail_config else "mock", gmail_config.command if gmail_config else "External command is unset; local mock server will be used"),
         Check("Google Drive command", "ready" if drive_config else "mock", drive_config.command if drive_config else "External command is unset; local mock server will be used"),
         Check("Google OAuth client", "ready" if oauth_ready else "missing", "OAuth client JSON found" if oauth_ready else "Set GOOGLE_OAUTH_CLIENT_JSON to the downloaded client JSON path"),
-        Check("Spotify MCP server", "ready" if spotify_config else "mock", spotify_config.command if spotify_config else "External command is unset; local mock server will be used"),
         Check(
             "Streamable HTTP server",
             "ready" if http_ready else "disabled" if not http_config else "invalid",

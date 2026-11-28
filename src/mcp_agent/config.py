@@ -41,14 +41,6 @@ def drive_server_config() -> ExternalServerConfig | None:
     return ExternalServerConfig(command=command, args=args, env=dict(os.environ))
 
 
-def spotify_server_config() -> ExternalServerConfig | None:
-    command = os.getenv("SPOTIFY_MCP_COMMAND")
-    if not command:
-        return None
-    args = shlex.split(os.getenv("SPOTIFY_MCP_ARGS", "stdio"))
-    return ExternalServerConfig(command=command, args=args, env=dict(os.environ))
-
-
 def streamable_http_server_config() -> StreamableHTTPServerConfig | None:
     url = os.getenv("MCP_HTTP_SERVER_URL")
     if not url:
