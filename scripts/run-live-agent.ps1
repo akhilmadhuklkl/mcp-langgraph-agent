@@ -6,6 +6,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if (-not $GoogleOAuthClientJson) {
+    $candidate = Get-ChildItem -LiteralPath (Join-Path $env:USERPROFILE "Downloads") -Filter "client_secret*.json" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($candidate) { $GoogleOAuthClientJson = $candidate.FullName }
+}
 if (-not $GoogleOAuthClientJson -or -not (Test-Path -LiteralPath $GoogleOAuthClientJson)) {
     throw "Provide -GoogleOAuthClientJson with the downloaded Google OAuth client JSON path."
 }
@@ -13,7 +17,16 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "GitHub CLI (gh) is required for secure GitHub authentication."
 }
 
-$githubToken = gh auth token
+$githubToken = gh auth token 2>$null
+if (-not $githubToken) {
+    $credentialInput = "protocol=https`nhost=github.com`n`n"
+    $credentialLines = $credentialInput | git credential fill 2>$null
+    $credentialMap = @{}
+    foreach ($line in $credentialLines) {
+        if ($line -match "^(.*?)=(.*)$") { $credentialMap[$matches[1]] = $matches[2] }
+    }
+    $githubToken = $credentialMap["password"]
+}
 if (-not $githubToken) {
     throw "Authenticate GitHub first with: gh auth login"
 }
