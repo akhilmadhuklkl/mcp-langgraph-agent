@@ -39,6 +39,10 @@ See [docs/deployment.md](docs/deployment.md) for Docker and production guidance.
 - `drive`: search project files and create documents
 - `spotify`: search the Spotify catalog and inspect the authenticated user's profile/playlists
 
+Spotify note: the repository includes an offline Spotify mock, which is the
+default when `SPOTIFY_MCP_COMMAND` is unset. Real Spotify Web API access is
+kept as an optional bridge and requires Spotify Developer access and OAuth.
+
 ## Setup
 
 ```powershell
