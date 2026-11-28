@@ -221,6 +221,15 @@ Create a standalone browser report with:
 python -m mcp_agent.cli metrics --html > metrics.html
 ```
 
+For Windows Task Scheduler or another scheduler, run a request and save its
+JSON result with:
+
+```powershell
+.\scripts\run-scheduled.ps1 `
+  -Request "Search Gmail for MCP" `
+  -OutputDirectory "data\scheduled-runs"
+```
+
 Run tests:
 
 ```powershell
