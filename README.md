@@ -179,12 +179,15 @@ credentials in the current process environment:
   -GoogleOAuthClientJson "C:\Users\User\Downloads\client_secret_<client-id>.json"
 ```
 
-To run read-only contract checks against all three real MCP servers after they
+To run read-only contract checks against all configured real MCP servers after they
 are configured, use:
 
 ```powershell
 python scripts/verify_live_servers.py
 ```
+
+The check includes Spotify when `SPOTIFY_MCP_COMMAND` is configured; otherwise
+it reports that Spotify is not configured.
 
 This validates that the expected tools are discoverable and accepts the same
 arguments used by the agent. It is intentionally opt-in and is not part of CI
