@@ -2,6 +2,14 @@ import os
 from typing import Any
 
 
+def ollama_settings() -> tuple[str, str] | None:
+    """Return local Ollama model and endpoint when configured."""
+    model = os.getenv("OLLAMA_MODEL")
+    if not model:
+        return None
+    return model, os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1")
+
+
 def deterministic_plan(request: str) -> list[dict[str, Any]]:
     text = request.lower()
     plan: list[dict[str, Any]] = []
@@ -49,12 +57,13 @@ async def llm_plan(request: str, tools: list[dict[str, Any]]) -> list[dict[str, 
         "messages or mutate data unless the user explicitly requests it.\n\n"
         f"Available tools:\n{tool_text}\n\nUser request: {request}"
     )
-    ollama_model = os.getenv("OLLAMA_MODEL")
-    if ollama_model:
+    ollama = ollama_settings()
+    if ollama:
+        ollama_model, ollama_base_url = ollama
         model = ChatOpenAI(
             model=ollama_model,
             temperature=0,
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
+            base_url=ollama_base_url,
             api_key="ollama",
         )
     else:
