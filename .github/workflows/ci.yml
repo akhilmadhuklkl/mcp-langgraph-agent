@@ -53,3 +53,6 @@ jobs:
 
       - name: Build container image
         run: docker build --tag mcp-langgraph-agent:ci .
+
+      - name: Run container smoke test
+        run: docker run --rm mcp-langgraph-agent:ci doctor --json
