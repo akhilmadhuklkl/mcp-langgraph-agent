@@ -239,6 +239,13 @@ To demonstrate the complete local workflow without external credentials, run:
 .\scripts\demo-local.ps1
 ```
 
+Build and run the CLI in Docker:
+
+```powershell
+docker build -t mcp-langgraph-agent .
+docker run --rm mcp-langgraph-agent doctor
+```
+
 ## Architecture
 
 ```text
