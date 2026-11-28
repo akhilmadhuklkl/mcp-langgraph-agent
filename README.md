@@ -9,6 +9,7 @@ See the [architecture guide](docs/architecture.md) for the system design.
 See the [security policy](SECURITY.md) for credential-handling and reporting guidance.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull-request guidelines.
 See [CHANGELOG.md](CHANGELOG.md) for the project history.
+This project is available under the [MIT License](LICENSE).
 
 ## What this demonstrates
 
